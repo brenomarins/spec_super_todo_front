@@ -30,7 +30,7 @@ test('renders pomodoro summary', () => {
   render(<TaskDetailPanel task={task} subtasks={[]} tags={[]} allTags={[]} linkedNotes={[]}
     pomodoroStats={stats} sessions={sessions}
     onClose={() => {}} onUpdate={() => {}} onAddSubtask={() => {}} onTagChange={() => {}} onTagCreate={() => {}} />)
-  expect(screen.getByText('Completed')).toBeInTheDocument()
+  expect(screen.getAllByText('Completed').length).toBeGreaterThanOrEqual(1)
   expect(screen.getByText('50')).toBeInTheDocument()
 })
 
@@ -38,8 +38,8 @@ test('renders session history with completed and interrupted labels', () => {
   render(<TaskDetailPanel task={task} subtasks={[]} tags={[]} allTags={[]} linkedNotes={[]}
     pomodoroStats={stats} sessions={sessions}
     onClose={() => {}} onUpdate={() => {}} onAddSubtask={() => {}} onTagChange={() => {}} onTagCreate={() => {}} />)
-  expect(screen.getByText(/completed/i)).toBeInTheDocument()
-  expect(screen.getByText(/interrupted/i)).toBeInTheDocument()
+  expect(screen.getAllByText(/completed/i).length).toBeGreaterThanOrEqual(1)
+  expect(screen.getAllByText(/interrupted/i).length).toBeGreaterThanOrEqual(1)
 })
 
 test('calls onClose when × button clicked', () => {

@@ -99,7 +99,7 @@ export function TasksTab() {
           subtasks={selectedSubtasks}
           tags={tags.filter((tg) => selectedTask.tagIds.includes(tg.id))}
           allTags={tags}
-          linkedNotes={[]}
+          linkedNotes={[]} // wired in Notes feature (Tasks 27-31)
           pomodoroStats={selectedStats as any}
           sessions={selectedSessions as any}
           onClose={() => setSelectedTaskId(null)}

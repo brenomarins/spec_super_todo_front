@@ -96,8 +96,8 @@ export function TaskDetailPanel({
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {[
               ['Started', pomodoroStats.totalStarted],
-              ['Done', pomodoroStats.totalCompleted],
-              ['Missed', pomodoroStats.totalInterrupted],
+              ['Completed', pomodoroStats.totalCompleted],
+              ['Interrupted', pomodoroStats.totalInterrupted],
               ['Min focused', pomodoroStats.totalMinutesFocused],
             ].map(([label, val]) => (
               <div key={String(label)} style={{ background: 'var(--color-surface)', borderRadius: 6, padding: 8 }}>
