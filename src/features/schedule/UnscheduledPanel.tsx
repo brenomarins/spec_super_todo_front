@@ -58,20 +58,18 @@ export function UnscheduledPanel({ tasks, tags, onTaskClick }: UnscheduledPanelP
         <span>Unscheduled ({tasks.length})</span>
         <span>{open ? '▲' : '▼'}</span>
       </button>
-      {open && (
-        <div
-          ref={setNodeRef}
-          style={{
-            minHeight: 60,
-            background: isOver ? 'var(--color-surface-2)' : 'transparent',
-            borderRadius: 6,
-          }}
-        >
-          {tasks.map(task => (
-            <DraggableCard key={task.id} task={task} tags={tags} onTaskClick={onTaskClick} />
-          ))}
-        </div>
-      )}
+      <div
+        ref={setNodeRef}
+        style={{
+          minHeight: open ? 60 : 0,
+          background: isOver ? 'var(--color-surface-2)' : 'transparent',
+          borderRadius: 6,
+        }}
+      >
+        {open && tasks.map(task => (
+          <DraggableCard key={task.id} task={task} tags={tags} onTaskClick={onTaskClick} />
+        ))}
+      </div>
     </div>
   )
 }

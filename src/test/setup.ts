@@ -4,15 +4,8 @@ import 'fake-indexeddb/auto'
 // jsdom 29 does not synthesize CSS shorthand values (like `border`) in getComputedStyle.
 // This custom matcher extends toHaveStyle to fall back to checking the inline style
 // attribute string for CSS shorthand properties that jsdom cannot compute.
-const jestDomMatchers = (globalThis as any).__jestDomMatchers__
 expect.extend({
   toHaveStyle(this: any, element: HTMLElement, css: string | Record<string, string>) {
-    // Use jest-dom's implementation via vitest's expect internals
-    // by delegating to the original matcher stored on the matcher object
-    const originalResult = (this as any).equals !== undefined
-      ? undefined  // can't easily call original
-      : undefined
-
     // Normalize input to object
     const styles: Record<string, string> = typeof css === 'string'
       ? Object.fromEntries(

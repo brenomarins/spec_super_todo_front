@@ -1,8 +1,8 @@
 // src/features/schedule/ScheduleTab.tsx
 import { useState } from 'react'
 import { DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
-import { startOfISOWeek, addDays, format, isToday } from 'date-fns'
-import { addWeeks } from '../../lib/dateUtils'
+import { startOfISOWeek, addDays, format } from 'date-fns'
+import { addWeeks, isToday } from '../../lib/dateUtils'
 import { WeekNavigation } from './WeekNavigation'
 import { DayColumn } from './DayColumn'
 import { UnscheduledPanel } from './UnscheduledPanel'
@@ -16,7 +16,7 @@ const DAY_LABELS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
 export function ScheduleTab() {
   const { tasks, updateTask } = useTaskStore()
   const { tags } = useTagStore()
-  const sensors = useSensors(useSensor(PointerSensor))
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
   const [weekOffset, setWeekOffset] = useState(0)
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
@@ -47,7 +47,7 @@ export function ScheduleTab() {
     const overId = String(over.id)
 
     if (overId.startsWith('day-')) {
-      const day = overId.replace('day-', '')
+      const day = overId.slice('day-'.length)
       updateTask({ id: taskId, scheduledDay: day })
     } else if (overId === 'unscheduled') {
       updateTask({ id: taskId, scheduledDay: undefined })
@@ -73,7 +73,7 @@ export function ScheduleTab() {
                   label={DAY_LABELS[i]}
                   tasks={scheduledThisWeek.filter(t => t.scheduledDay === dayStrings[i])}
                   tags={tags}
-                  isToday={isToday(day)}
+                  isToday={isToday(dayStrings[i])}
                   onTaskClick={setSelectedTaskId}
                   onRemoveDay={(id) => updateTask({ id, scheduledDay: undefined })}
                 />
