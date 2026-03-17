@@ -24,6 +24,8 @@ export function downloadJSON(payload: ExportPayload): void {
   const a = document.createElement('a')
   a.href = url
   a.download = `time-manager-backup-${payload.exportedAt.slice(0, 10)}.json`
+  document.body.appendChild(a)
   a.click()
-  URL.revokeObjectURL(url)
+  document.body.removeChild(a)
+  setTimeout(() => URL.revokeObjectURL(url), 100)
 }

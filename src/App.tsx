@@ -12,19 +12,21 @@ export default function App() {
     db.open().catch(() => setDbError(true))
   }, [])
 
-  if (dbError) return <RecoveryScreen />
-
   return (
     <ToastProvider>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-        <TabBar active={tab} onChange={setTab} />
-        <main style={{ flex: 1, overflow: 'auto', padding: 16 }}>
-          {tab === 'home' && <div>Home tab — coming soon</div>}
-          {tab === 'tasks' && <div>Tasks tab — coming soon</div>}
-          {tab === 'schedule' && <div>Schedule tab — coming soon</div>}
-          {tab === 'notes' && <div>Notes tab — coming soon</div>}
-        </main>
-      </div>
+      {dbError ? (
+        <RecoveryScreen />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+          <TabBar active={tab} onChange={setTab} />
+          <main style={{ flex: 1, overflow: 'auto', padding: 16 }}>
+            {tab === 'home' && <div>Home tab — coming soon</div>}
+            {tab === 'tasks' && <div>Tasks tab — coming soon</div>}
+            {tab === 'schedule' && <div>Schedule tab — coming soon</div>}
+            {tab === 'notes' && <div>Notes tab — coming soon</div>}
+          </main>
+        </div>
+      )}
     </ToastProvider>
   )
 }

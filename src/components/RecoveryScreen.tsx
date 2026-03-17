@@ -3,6 +3,8 @@ import { db } from '../db/db'
 
 export function RecoveryScreen() {
   async function handleExport() {
+    // Note: If db.open() failed due to corruption, these queries may also fail.
+    // The catch block handles this by showing an alert — best-effort export only.
     try {
       const [tasks, tags, notes, sessions] = await Promise.all([
         db.tasks.toArray(), db.tags.toArray(),
