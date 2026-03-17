@@ -16,7 +16,10 @@ export function SubtaskItem({ task, onClick, onToggle }: SubtaskItemProps) {
         style={{ cursor: 'pointer', accentColor: 'var(--color-success)' }}
       />
       <span
+        role="button"
+        tabIndex={0}
         onClick={() => onClick(task.id)}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick(task.id) }}
         style={{
           cursor: 'pointer', fontSize: 13,
           textDecoration: task.completed ? 'line-through' : 'none',

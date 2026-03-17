@@ -15,7 +15,7 @@ const mockTasks = [
 beforeEach(() => {
   vi.mocked(useTaskStore).mockReturnValue({
     tasks: mockTasks, addTask: vi.fn(), updateTask: vi.fn(),
-    reorderTasks: vi.fn(), loading: false,
+    reorderTasks: vi.fn(),
   } as any)
   vi.mocked(useTagStore).mockReturnValue({ tags: [], addTag: vi.fn() } as any)
   vi.mocked(usePomodoroStore).mockReturnValue({

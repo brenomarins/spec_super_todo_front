@@ -8,12 +8,15 @@ import { useTaskStore } from '../../store/taskStore'
 import { useTagStore } from '../../store/tagStore'
 import { usePomodoroStore } from '../../store/pomodoroStore'
 import { getOrderBetween, needsReindex, reindexGroup } from '../../lib/orderUtils'
-import type { Task } from '../../types'
+import type { Task, PomodoroStats, PomodoroSession } from '../../types'
 
 export function TasksTab() {
   const { tasks, addTask, updateTask, reorderTasks } = useTaskStore()
   const { tags, addTag } = useTagStore()
-  const { activeSession, stats, sessions } = usePomodoroStore() as any
+  const { activeSession } = usePomodoroStore()
+  // stats and sessions wired in Tasks 32-34 (Pomodoro feature)
+  const stats: Record<string, PomodoroStats> = {}
+  const sessions: Record<string, PomodoroSession[]> = {}
 
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
   const [filterTagId, setFilterTagId] = useState<string | null>(null)
@@ -27,8 +30,8 @@ export function TasksTab() {
 
   const selectedTask = tasks.find((t: Task) => t.id === selectedTaskId) ?? null
   const selectedSubtasks = selectedTask ? subtasks.filter((s: Task) => s.parentId === selectedTask.id) : []
-  const selectedSessions = selectedTask ? ((sessions as Record<string, unknown[]>)?.[selectedTask.id] ?? []) : []
-  const selectedStats = selectedTask ? ((stats as Record<string, unknown>)?.[selectedTask.id] ?? null) : null
+  const selectedSessions = selectedTask ? (sessions[selectedTask.id] ?? []) : []
+  const selectedStats = selectedTask ? (stats[selectedTask.id] ?? null) : null
 
   async function handleAddTask(title: string) {
     const lastOrder = topLevelTasks.length > 0 ? Math.max(...topLevelTasks.map((t: Task) => t.order)) : 0
@@ -55,10 +58,11 @@ export function TasksTab() {
 
   async function handleReorder(orderedIds: string[]) {
     await reorderTasks(orderedIds, null)
-    const updatedTasks = topLevelTasks.filter((t: Task) => orderedIds.includes(t.id))
-    const orders = updatedTasks.map((t: Task) => t.order)
+    // read fresh state after await to avoid stale closure
+    const freshTasks = useTaskStore.getState().tasks.filter((t: Task) => !t.parentId && orderedIds.includes(t.id))
+    const orders = freshTasks.map((t: Task) => t.order)
     if (needsReindex(orders)) {
-      const idToOrder = new Map(updatedTasks.map((t: Task) => [t.id, t.order]))
+      const idToOrder = new Map(freshTasks.map((t: Task) => [t.id, t.order]))
       const reindexed = reindexGroup(orderedIds, idToOrder)
       await Promise.all([...reindexed.entries()].map(([id, order]) =>
         updateTask({ id, order })
@@ -82,8 +86,8 @@ export function TasksTab() {
           tasks={filteredTopLevel}
           subtasks={subtasks}
           tags={tags}
-          pomodoroStats={(stats as any) ?? {}}
-          activeTaskId={(activeSession as any)?.taskId ?? null}
+          pomodoroStats={stats}
+          activeTaskId={activeSession?.taskId ?? null}
           onTaskClick={setSelectedTaskId}
           onTaskToggle={(id) => {
             const t = tasks.find((x: Task) => x.id === id)
@@ -100,8 +104,8 @@ export function TasksTab() {
           tags={tags.filter((tg) => selectedTask.tagIds.includes(tg.id))}
           allTags={tags}
           linkedNotes={[]} // wired in Notes feature (Tasks 27-31)
-          pomodoroStats={selectedStats as any}
-          sessions={selectedSessions as any}
+          pomodoroStats={selectedStats}
+          sessions={selectedSessions}
           onClose={() => setSelectedTaskId(null)}
           onUpdate={updateTask}
           onAddSubtask={handleAddSubtask}

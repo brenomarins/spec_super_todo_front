@@ -30,7 +30,13 @@ export function TaskItem({ task, tags, pomodoroCount, isActive, onClick, onToggl
         onChange={() => onToggle(task.id)}
         style={{ marginTop: 2, cursor: 'pointer', accentColor: 'var(--color-success)' }}
       />
-      <div style={{ flex: 1, cursor: 'pointer' }} onClick={() => onClick(task.id)}>
+      <div
+        role="button"
+        tabIndex={0}
+        style={{ flex: 1, cursor: 'pointer' }}
+        onClick={() => onClick(task.id)}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick(task.id) }}
+      >
         <span style={{
           textDecoration: task.completed ? 'line-through' : 'none',
           color: task.completed ? 'var(--color-text-muted)' : 'var(--color-text)',
