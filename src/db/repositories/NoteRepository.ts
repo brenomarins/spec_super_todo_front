@@ -22,7 +22,14 @@ export class NoteRepository {
   }
 
   async update(id: string, changes: Partial<Omit<Note, 'id' | 'createdAt'>>): Promise<void> {
-    await this.db.notes.update(id, { ...changes, updatedAt: new Date().toISOString() })
+    const normalized = changes.title !== undefined
+      ? { ...changes, title: changes.title.trim() || 'Untitled' }
+      : changes
+    await this.db.notes.update(id, { ...normalized, updatedAt: new Date().toISOString() })
+  }
+
+  async getById(id: string): Promise<Note | undefined> {
+    return this.db.notes.get(id)
   }
 
   async delete(id: string): Promise<void> {

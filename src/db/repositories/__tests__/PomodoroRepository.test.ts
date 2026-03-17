@@ -50,6 +50,7 @@ describe('PomodoroRepository.interruptWorkSession', () => {
     const stats = await db.pomodoroStats.get('task1')
     expect(stats?.totalInterrupted).toBe(1)
     expect(stats?.totalCompleted).toBe(0)
+    expect(await repo.getOpenSession()).toBeUndefined()
   })
 })
 

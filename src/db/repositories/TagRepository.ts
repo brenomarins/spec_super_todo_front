@@ -45,4 +45,8 @@ export class TagRepository {
   async getAll(): Promise<Tag[]> {
     return this.db.tags.toArray()
   }
+
+  async getById(id: string): Promise<Tag | undefined> {
+    return this.db.tags.get(id)
+  }
 }

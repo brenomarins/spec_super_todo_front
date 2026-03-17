@@ -4,6 +4,8 @@ import type { TimeManagerDB } from '../db'
 import type { PomodoroSession, PomodoroStats } from '../../types'
 
 export const WORK_DURATION = 25
+export const SHORT_BREAK_DURATION = 5
+export const LONG_BREAK_DURATION = 15
 
 export class PomodoroRepository {
   constructor(private db: TimeManagerDB) {}
@@ -16,6 +18,7 @@ export class PomodoroRepository {
       completedAt: null,
       type: 'work',
       durationMinutes: WORK_DURATION,
+      isOpen: 1,
     }
     await this.db.transaction('rw', [this.db.pomodoroSessions, this.db.pomodoroStats], async () => {
       await this.db.pomodoroSessions.add(session)
@@ -25,10 +28,10 @@ export class PomodoroRepository {
   }
 
   async completeWorkSession(id: string, completedAt: string): Promise<void> {
-    const session = await this.db.pomodoroSessions.get(id)
-    if (!session || session.type !== 'work') return
     await this.db.transaction('rw', [this.db.pomodoroSessions, this.db.pomodoroStats], async () => {
-      await this.db.pomodoroSessions.update(id, { completedAt })
+      const session = await this.db.pomodoroSessions.get(id)
+      if (!session || session.type !== 'work') return
+      await this.db.pomodoroSessions.update(id, { completedAt, isOpen: 0 })
       if (session.taskId) {
         await this._upsertStats(session.taskId, stats => ({
           ...stats,
@@ -41,10 +44,11 @@ export class PomodoroRepository {
   }
 
   async interruptWorkSession(id: string): Promise<void> {
-    const session = await this.db.pomodoroSessions.get(id)
-    if (!session || session.type !== 'work') return
     await this.db.transaction('rw', [this.db.pomodoroSessions, this.db.pomodoroStats], async () => {
-      // completedAt stays null — already the interrupted signal per spec
+      const session = await this.db.pomodoroSessions.get(id)
+      if (!session || session.type !== 'work') return
+      // completedAt stays null — null signals interrupted per spec
+      await this.db.pomodoroSessions.update(id, { isOpen: 0 })
       if (session.taskId) {
         await this._upsertStats(session.taskId, stats => ({
           ...stats,
@@ -56,24 +60,25 @@ export class PomodoroRepository {
   }
 
   async createBreakSession(taskId: string | undefined, type: 'short_break' | 'long_break'): Promise<PomodoroSession> {
-    const durationMinutes = type === 'short_break' ? 5 : 15
+    const durationMinutes = type === 'short_break' ? SHORT_BREAK_DURATION : LONG_BREAK_DURATION
     const session: PomodoroSession = {
       id: nanoid(), taskId, startedAt: new Date().toISOString(),
-      completedAt: null, type, durationMinutes,
+      completedAt: null, type, durationMinutes, isOpen: 1,
     }
     await this.db.pomodoroSessions.add(session)
     return session
   }
 
   async completeBreakSession(id: string): Promise<void> {
-    const session = await this.db.pomodoroSessions.get(id)
-    if (!session || session.type === 'work') return
-    await this.db.pomodoroSessions.update(id, { completedAt: new Date().toISOString() })
+    await this.db.transaction('rw', this.db.pomodoroSessions, async () => {
+      const session = await this.db.pomodoroSessions.get(id)
+      if (!session || session.type === 'work') return
+      await this.db.pomodoroSessions.update(id, { completedAt: new Date().toISOString(), isOpen: 0 })
+    })
   }
 
   async getOpenSession(): Promise<PomodoroSession | undefined> {
-    // completedAt is stored as null (not the string "null"), so use filter()
-    return this.db.pomodoroSessions.filter(s => s.completedAt === null).first()
+    return this.db.pomodoroSessions.where('isOpen').equals(1).first()
   }
 
   async getSessionsByTaskId(taskId: string): Promise<PomodoroSession[]> {

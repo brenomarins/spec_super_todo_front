@@ -35,6 +35,7 @@ export interface PomodoroSession {
   completedAt: string | null  // null = interrupted/abandoned; never undefined
   type: 'work' | 'short_break' | 'long_break'
   durationMinutes: number
+  isOpen: 0 | 1   // 1 = active session, 0 = completed/interrupted
 }
 
 export interface PomodoroStats {
