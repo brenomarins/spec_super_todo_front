@@ -15,7 +15,7 @@ export class TimeManagerDB extends Dexie {
       // indexed fields only — Dexie stores all object fields regardless
       tasks: 'id, parentId, scheduledDay, order, *tagIds',
       tags: 'id',
-      notes: 'id, *linkedTaskIds',
+      notes: 'id, *tagIds, *linkedTaskIds',
       pomodoroSessions: 'id, taskId, startedAt, completedAt',
       pomodoroStats: 'taskId',
     })

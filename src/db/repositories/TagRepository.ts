@@ -31,9 +31,9 @@ export class TagRepository {
         })
       }
 
-      // Remove tagId from all notes
-      const notesWithTag = await this.db.notes.toArray()
-      for (const note of notesWithTag.filter(n => n.tagIds.includes(id))) {
+      // Remove tagId from all notes (use index now that *tagIds is indexed)
+      const notesWithTag = await this.db.notes.where('tagIds').equals(id).toArray()
+      for (const note of notesWithTag) {
         await this.db.notes.update(note.id, {
           tagIds: note.tagIds.filter(t => t !== id),
           updatedAt: new Date().toISOString(),

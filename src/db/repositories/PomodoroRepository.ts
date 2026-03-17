@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid'
 import type { TimeManagerDB } from '../db'
 import type { PomodoroSession, PomodoroStats } from '../../types'
 
-const WORK_DURATION = 25
+export const WORK_DURATION = 25
 
 export class PomodoroRepository {
   constructor(private db: TimeManagerDB) {}
@@ -43,14 +43,16 @@ export class PomodoroRepository {
   async interruptWorkSession(id: string): Promise<void> {
     const session = await this.db.pomodoroSessions.get(id)
     if (!session || session.type !== 'work') return
-    // completedAt stays null — already the interrupted signal per spec
-    if (session.taskId) {
-      await this._upsertStats(session.taskId, stats => ({
-        ...stats,
-        totalInterrupted: stats.totalInterrupted + 1,
-        lastSessionAt: new Date().toISOString(),
-      }))
-    }
+    await this.db.transaction('rw', [this.db.pomodoroSessions, this.db.pomodoroStats], async () => {
+      // completedAt stays null — already the interrupted signal per spec
+      if (session.taskId) {
+        await this._upsertStats(session.taskId, stats => ({
+          ...stats,
+          totalInterrupted: stats.totalInterrupted + 1,
+          lastSessionAt: new Date().toISOString(),
+        }))
+      }
+    })
   }
 
   async createBreakSession(taskId: string | undefined, type: 'short_break' | 'long_break'): Promise<PomodoroSession> {
@@ -64,6 +66,8 @@ export class PomodoroRepository {
   }
 
   async completeBreakSession(id: string): Promise<void> {
+    const session = await this.db.pomodoroSessions.get(id)
+    if (!session || session.type === 'work') return
     await this.db.pomodoroSessions.update(id, { completedAt: new Date().toISOString() })
   }
 
@@ -93,7 +97,7 @@ export class PomodoroRepository {
     const base: PomodoroStats = existing ?? {
       taskId, totalStarted: 0, totalCompleted: 0,
       totalInterrupted: 0, totalMinutesFocused: 0,
-      lastSessionAt: null, updatedAt: new Date().toISOString(),
+      lastSessionAt: null, updatedAt: '',
     }
     const updated = updater(base)
     await this.db.pomodoroStats.put({ ...updated, updatedAt: new Date().toISOString() })
