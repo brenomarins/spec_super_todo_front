@@ -2,10 +2,12 @@
 import { useState } from 'react'
 import { useDraggable, useDroppable } from '@dnd-kit/core'
 import type { Task, Tag } from '../../types'
+import { TagBadge } from '../../components/TagBadge'
 
-function DraggableCard({ task, onTaskClick }: { task: Task; onTaskClick: (id: string) => void }) {
+function DraggableCard({ task, tags, onTaskClick }: { task: Task; tags: Tag[]; onTaskClick: (id: string) => void }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: `unscheduled-${task.id}` })
   const style = transform ? { transform: `translate(${transform.x}px, ${transform.y}px)` } : {}
+  const taskTags = tags.filter(t => task.tagIds.includes(t.id))
   return (
     <div
       ref={setNodeRef}
@@ -20,7 +22,12 @@ function DraggableCard({ task, onTaskClick }: { task: Task; onTaskClick: (id: st
         borderRadius: 6, padding: '6px 10px', marginBottom: 4, cursor: 'grab', fontSize: 12, ...style,
       }}
     >
-      {task.title}
+      <div>{task.title}</div>
+      {taskTags.length > 0 && (
+        <div style={{ display: 'flex', gap: 3, marginTop: 3, flexWrap: 'wrap' }}>
+          {taskTags.map(tag => <TagBadge key={tag.id} tag={tag} />)}
+        </div>
+      )}
     </div>
   )
 }
@@ -31,7 +38,7 @@ interface UnscheduledPanelProps {
   onTaskClick: (id: string) => void
 }
 
-export function UnscheduledPanel({ tasks, onTaskClick }: UnscheduledPanelProps) {
+export function UnscheduledPanel({ tasks, tags, onTaskClick }: UnscheduledPanelProps) {
   const [open, setOpen] = useState(true)
   const { setNodeRef, isOver } = useDroppable({ id: 'unscheduled' })
 
@@ -61,7 +68,7 @@ export function UnscheduledPanel({ tasks, onTaskClick }: UnscheduledPanelProps) 
           }}
         >
           {tasks.map(task => (
-            <DraggableCard key={task.id} task={task} onTaskClick={onTaskClick} />
+            <DraggableCard key={task.id} task={task} tags={tags} onTaskClick={onTaskClick} />
           ))}
         </div>
       )}
