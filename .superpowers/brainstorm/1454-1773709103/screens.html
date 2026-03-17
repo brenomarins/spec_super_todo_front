@@ -1,0 +1,178 @@
+<h2>Main Screens</h2>
+<p class="subtitle">The four views of the app — click to zoom into any screen</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
+
+  <!-- HOME -->
+  <div style="background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:12px;font-family:monospace;font-size:11px;color:#c9d1d9">
+    <div style="display:flex;gap:8px;margin-bottom:10px;border-bottom:1px solid #21262d;padding-bottom:8px">
+      <span style="color:#58a6ff;font-weight:bold">Home</span>
+      <span style="color:#8b949e">Tasks</span>
+      <span style="color:#8b949e">Schedule</span>
+      <span style="color:#8b949e">Notes</span>
+    </div>
+
+    <!-- Pomodoro -->
+    <div style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:10px;margin-bottom:8px;text-align:center">
+      <div style="font-size:9px;color:#8b949e;margin-bottom:4px">FOCUS — Design Homepage</div>
+      <div style="font-size:28px;color:#f0883e;font-weight:bold;margin-bottom:6px">23:14</div>
+      <div style="display:flex;gap:6px;justify-content:center;margin-bottom:6px">
+        <button style="background:#238636;border:none;color:#fff;padding:4px 10px;border-radius:4px;font-size:9px;cursor:pointer">▶ Start</button>
+        <button style="background:#21262d;border:1px solid #30363d;color:#c9d1d9;padding:4px 10px;border-radius:4px;font-size:9px">⏹ Stop</button>
+      </div>
+      <div style="display:flex;gap:3px;justify-content:center">
+        <span style="width:8px;height:8px;background:#f0883e;border-radius:50%;display:inline-block"></span>
+        <span style="width:8px;height:8px;background:#f0883e;border-radius:50%;display:inline-block"></span>
+        <span style="width:8px;height:8px;background:#21262d;border-radius:50%;display:inline-block;border:1px solid #30363d"></span>
+        <span style="width:8px;height:8px;background:#21262d;border-radius:50%;display:inline-block;border:1px solid #30363d"></span>
+      </div>
+      <div style="font-size:9px;color:#8b949e;margin-top:4px">2 of 4 pomodoros • 50 min focused</div>
+    </div>
+
+    <!-- Today's tasks -->
+    <div style="font-size:9px;color:#8b949e;margin-bottom:4px">TODAY'S TASKS</div>
+    <div style="background:#161b22;border-radius:4px;padding:6px;margin-bottom:3px;display:flex;align-items:center;gap:6px">
+      <span style="color:#3fb950">✓</span>
+      <span style="text-decoration:line-through;color:#8b949e">Setup project</span>
+      <span style="margin-left:auto;background:#0d419d;color:#58a6ff;font-size:8px;padding:1px 5px;border-radius:10px">work</span>
+    </div>
+    <div style="background:#161b22;border-radius:4px;padding:6px;margin-bottom:3px;display:flex;align-items:center;gap:6px;border:1px solid #f0883e">
+      <span style="color:#f0883e">🍅</span>
+      <span>Design Homepage</span>
+      <span style="margin-left:auto;background:#0d419d;color:#58a6ff;font-size:8px;padding:1px 5px;border-radius:10px">work</span>
+    </div>
+    <div style="background:#161b22;border-radius:4px;padding:6px;display:flex;align-items:center;gap:6px">
+      <span style="color:#8b949e">○</span>
+      <span>Write tests</span>
+      <span style="margin-left:auto;background:#2d1b69;color:#d2a8ff;font-size:8px;padding:1px 5px;border-radius:10px">study</span>
+    </div>
+  </div>
+
+  <!-- TASKS -->
+  <div style="background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:12px;font-family:monospace;font-size:11px;color:#c9d1d9">
+    <div style="display:flex;gap:8px;margin-bottom:10px;border-bottom:1px solid #21262d;padding-bottom:8px">
+      <span style="color:#8b949e">Home</span>
+      <span style="color:#58a6ff;font-weight:bold">Tasks</span>
+      <span style="color:#8b949e">Schedule</span>
+      <span style="color:#8b949e">Notes</span>
+    </div>
+
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <input style="flex:1;background:#161b22;border:1px solid #30363d;border-radius:4px;padding:5px 8px;color:#c9d1d9;font-size:10px" placeholder="+ Add task...">
+      <button style="background:#21262d;border:1px solid #30363d;color:#c9d1d9;padding:4px 8px;border-radius:4px;font-size:9px">Filter</button>
+    </div>
+
+    <!-- Task with subtasks -->
+    <div style="background:#161b22;border:1px solid #30363d;border-radius:4px;padding:6px;margin-bottom:4px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <span style="color:#8b949e;cursor:grab">⠿</span>
+        <span style="color:#8b949e">○</span>
+        <span>Design Homepage</span>
+        <span style="margin-left:auto;display:flex;gap:4px">
+          <span style="background:#0d419d;color:#58a6ff;font-size:8px;padding:1px 5px;border-radius:10px">work</span>
+          <span style="color:#f0883e;font-size:9px">🍅 2</span>
+        </span>
+      </div>
+      <!-- subtasks -->
+      <div style="margin-left:16px;border-left:1px solid #30363d;padding-left:8px">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;font-size:10px">
+          <span style="color:#3fb950">✓</span>
+          <span style="text-decoration:line-through;color:#8b949e">Wireframes</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:10px">
+          <span style="color:#8b949e">○</span>
+          <span>Mockups</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#161b22;border:1px solid #30363d;border-radius:4px;padding:6px;margin-bottom:4px;display:flex;align-items:center;gap:6px">
+      <span style="color:#8b949e;cursor:grab">⠿</span>
+      <span style="color:#8b949e">○</span>
+      <span>Write tests</span>
+      <span style="margin-left:auto;background:#2d1b69;color:#d2a8ff;font-size:8px;padding:1px 5px;border-radius:10px">study</span>
+    </div>
+
+    <div style="background:#161b22;border:1px solid #30363d;border-radius:4px;padding:6px;display:flex;align-items:center;gap:6px">
+      <span style="color:#8b949e;cursor:grab">⠿</span>
+      <span style="color:#3fb950">✓</span>
+      <span style="text-decoration:line-through;color:#8b949e">Setup project</span>
+      <span style="margin-left:auto;background:#0d419d;color:#58a6ff;font-size:8px;padding:1px 5px;border-radius:10px">work</span>
+    </div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div style="background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:12px;font-family:monospace;font-size:11px;color:#c9d1d9">
+    <div style="display:flex;gap:8px;margin-bottom:10px;border-bottom:1px solid #21262d;padding-bottom:8px">
+      <span style="color:#8b949e">Home</span>
+      <span style="color:#8b949e">Tasks</span>
+      <span style="color:#58a6ff;font-weight:bold">Schedule</span>
+      <span style="color:#8b949e">Notes</span>
+    </div>
+    <div style="font-size:9px;color:#8b949e;margin-bottom:6px">Week of Mar 16</div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">
+      <div style="background:#161b22;border-radius:4px;padding:5px">
+        <div style="font-size:9px;color:#58a6ff;margin-bottom:4px;text-align:center">MON</div>
+        <div style="background:#0d419d;border-radius:3px;padding:3px;font-size:9px;margin-bottom:2px">Design</div>
+        <div style="background:#0d419d;border-radius:3px;padding:3px;font-size:9px">Tests</div>
+      </div>
+      <div style="background:#161b22;border-radius:4px;padding:5px">
+        <div style="font-size:9px;color:#8b949e;margin-bottom:4px;text-align:center">TUE</div>
+        <div style="background:#2d1b69;border-radius:3px;padding:3px;font-size:9px">Review</div>
+      </div>
+      <div style="background:#161b22;border-radius:4px;padding:5px">
+        <div style="font-size:9px;color:#8b949e;margin-bottom:4px;text-align:center">WED</div>
+      </div>
+      <div style="background:#161b22;border-radius:4px;padding:5px">
+        <div style="font-size:9px;color:#8b949e;margin-bottom:4px;text-align:center">THU</div>
+        <div style="background:#3d2314;border-radius:3px;padding:3px;font-size:9px">Deploy</div>
+      </div>
+      <div style="background:#161b22;border-radius:4px;padding:5px">
+        <div style="font-size:9px;color:#8b949e;margin-bottom:4px;text-align:center">FRI</div>
+      </div>
+      <div style="background:#161b22;border-radius:4px;padding:5px">
+        <div style="font-size:9px;color:#8b949e;margin-bottom:4px;text-align:center">SAT</div>
+      </div>
+      <div style="background:#161b22;border-radius:4px;padding:5px">
+        <div style="font-size:9px;color:#8b949e;margin-bottom:4px;text-align:center">SUN</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div style="background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:12px;font-family:monospace;font-size:11px;color:#c9d1d9">
+    <div style="display:flex;gap:8px;margin-bottom:10px;border-bottom:1px solid #21262d;padding-bottom:8px">
+      <span style="color:#8b949e">Home</span>
+      <span style="color:#8b949e">Tasks</span>
+      <span style="color:#8b949e">Schedule</span>
+      <span style="color:#58a6ff;font-weight:bold">Notes</span>
+    </div>
+    <div style="display:flex;gap:8px;height:130px">
+      <!-- note list -->
+      <div style="width:100px;border-right:1px solid #21262d;padding-right:8px">
+        <div style="font-size:9px;color:#8b949e;margin-bottom:4px">NOTES</div>
+        <div style="background:#21262d;border-radius:3px;padding:4px;margin-bottom:3px;font-size:9px;border-left:2px solid #58a6ff">Q2 Planning</div>
+        <div style="padding:4px;margin-bottom:3px;font-size:9px;color:#8b949e">Meeting notes</div>
+        <div style="padding:4px;font-size:9px;color:#8b949e">Ideas</div>
+        <div style="padding:4px;font-size:9px;color:#3fb950;cursor:pointer">+ New note</div>
+      </div>
+      <!-- editor -->
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:bold;margin-bottom:4px">Q2 Planning</div>
+        <div style="display:flex;gap:4px;margin-bottom:6px">
+          <span style="background:#0d419d;color:#58a6ff;font-size:8px;padding:1px 5px;border-radius:10px">work</span>
+          <span style="background:#3d2314;color:#f0883e;font-size:8px;padding:1px 5px;border-radius:10px">+ tag</span>
+        </div>
+        <div style="font-size:10px;color:#c9d1d9;line-height:1.6">
+          <strong>Goals</strong><br/>
+          • Launch new homepage<br/>
+          • Improve test coverage<br/>
+          <span style="color:#8b949e">↗ Design Homepage</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px;text-align:center">Take a look — does the layout and flow feel right? Let me know what you'd change.</p>

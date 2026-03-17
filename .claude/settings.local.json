@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(C:/Users/breno/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.2/skills/brainstorming/scripts/start-server.sh --project-dir \"E:/codigos/spec_super_todo_front\")",
+      "Bash(python3:*)",
+      "Bash(node:*)",
+      "Bash(powershell -Command \"Get-Content 'E:/codigos/spec_super_todo_front/tmp_chunk3.md' | Add-Content 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md'\")",
+      "Bash(powershell -Command \"Get-Content 'E:/codigos/spec_super_todo_front/tmp_chunk4.md' | Add-Content 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md'\")",
+      "Bash(powershell -Command \"Get-Content 'E:/codigos/spec_super_todo_front/tmp_chunk5.md' | Add-Content 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md'\")",
+      "Bash(powershell -Command \"Get-Content 'E:/codigos/spec_super_todo_front/tmp_chunk6.md' | Add-Content 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md'\")",
+      "Bash(powershell -Command \"Get-Content 'E:/codigos/spec_super_todo_front/tmp_chunk7.md' | Add-Content 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md'\")",
+      "Bash(powershell -Command \"Get-Content 'E:/codigos/spec_super_todo_front/tmp_chunk8.md' | Add-Content 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md'\")",
+      "Bash(powershell -Command \"\\(Get-Content 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md'\\).Count\")",
+      "Bash(powershell -Command \"Remove-Item 'E:/codigos/spec_super_todo_front/tmp_chunk*.md'\")",
+      "Bash(powershell -Command \"Select-String -Path 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md' -Pattern 'orderUtils|getNewOrder|now\\\\\\(\\\\\\)' | Select-Object -First 15\")",
+      "Bash(powershell -Command \"Select-String -Path 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md' -Pattern \\\\\"import.*utils/dateUtils|import.*now.*dateUtils|from '../../utils/\\\\\" | Select-Object LineNumber, Line\")",
+      "Bash(powershell -Command \"Select-String -Path 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md' -Pattern 'now\\\\\\(\\\\\\)' | Select-Object LineNumber, Line\")",
+      "Bash(powershell -Command \"Select-String -Path 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md' -Pattern 'recoverStaleSession|TWO_HOURS_MS|pomodoroStats.get' | Select-Object LineNumber, Line | Select-Object -First 20\")",
+      "Bash(powershell -Command \"Select-String -Path 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md' -Pattern 'Date\\\\.nowISO\\\\\\(\\\\\\)' | Select-Object LineNumber, Line\")",
+      "Bash(powershell -Command \"\n\\\\$chunk9 = Get-Content 'E:/codigos/spec_super_todo_front/tmp_chunk9.md' -Raw\n\\\\$plan = Get-Content 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md' -Raw\n\\\\$plan = \\\\$plan -replace '<!-- Chunk 9 inserted below -->', \\\\$chunk9\nSet-Content 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md' -Value \\\\$plan -NoNewline\nWrite-Host 'Done'\n\")",
+      "Bash(powershell -Command \"Remove-Item 'E:/codigos/spec_super_todo_front/tmp_chunk9.md'; \\(Get-Content 'E:/codigos/spec_super_todo_front/docs/superpowers/plans/2026-03-16-time-manager.md'\\).Count\")",
+      "Bash(npm create:*)",
+      "Bash(printf \"2\\\\n\")",
+      "Bash(npx create-vite@latest . --template react-ts)",
+      "Bash(npx create-vite@latest --help)",
+      "Bash(npx create-vite@latest . --template react-ts --no-interactive)",
+      "Bash(npx:*)",
+      "Bash(cp:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(ls E:/codigos/spec_super_todo_front/node_modules/vitest/dist/*.d.ts)",
+      "Bash(ls E:/codigos/spec_super_todo_front/node_modules/vitest/*.d.ts)"
+    ]
+  }
+}

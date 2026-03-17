@@ -1,0 +1,106 @@
+<h2>Main Page Layout</h2>
+<p class="subtitle">How should the three main areas (Tasks, Schedule, Notes) be arranged?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#0d1117;border-radius:6px;font-family:monospace;font-size:12px;color:#8b949e">
+      <div style="display:grid;grid-template-columns:1fr 2fr;grid-template-rows:auto 1fr;gap:6px;height:140px">
+        <div style="background:#161b22;border:1px solid #30363d;border-radius:4px;padding:8px;grid-row:1/3">
+          <div style="color:#58a6ff;font-size:10px;margin-bottom:4px">TASKS</div>
+          <div style="background:#21262d;border-radius:3px;padding:4px;margin-bottom:3px;font-size:10px">✓ Task 1 <span style="color:#3fb950;float:right">tag</span></div>
+          <div style="background:#21262d;border-radius:3px;padding:4px;margin-bottom:3px;font-size:10px">○ Task 2</div>
+          <div style="background:#21262d;border-radius:3px;padding:4px;margin-bottom:3px;font-size:10px">○ Task 3</div>
+          <div style="background:#21262d;border-radius:3px;padding:4px;font-size:10px">○ Task 4</div>
+        </div>
+        <div style="background:#161b22;border:1px solid #30363d;border-radius:4px;padding:8px">
+          <div style="color:#58a6ff;font-size:10px;margin-bottom:4px">WEEKLY SCHEDULE (Kanban)</div>
+          <div style="display:flex;gap:4px">
+            <div style="flex:1;background:#21262d;border-radius:3px;padding:4px;font-size:9px">
+              <div style="color:#8b949e;margin-bottom:2px">MON</div>
+              <div style="background:#0d419d;border-radius:2px;padding:2px;margin-bottom:2px">Task 1</div>
+            </div>
+            <div style="flex:1;background:#21262d;border-radius:3px;padding:4px;font-size:9px">
+              <div style="color:#8b949e;margin-bottom:2px">TUE</div>
+              <div style="background:#0d419d;border-radius:2px;padding:2px;margin-bottom:2px">Task 3</div>
+            </div>
+            <div style="flex:1;background:#21262d;border-radius:3px;padding:4px;font-size:9px">
+              <div style="color:#8b949e;margin-bottom:2px">WED</div>
+            </div>
+            <div style="flex:1;background:#21262d;border-radius:3px;padding:4px;font-size:9px">
+              <div style="color:#8b949e;margin-bottom:2px">THU</div>
+              <div style="background:#0d419d;border-radius:2px;padding:2px">Task 2</div>
+            </div>
+          </div>
+        </div>
+        <div style="background:#161b22;border:1px solid #30363d;border-radius:4px;padding:8px">
+          <div style="color:#58a6ff;font-size:10px;margin-bottom:4px">NOTES</div>
+          <div style="font-size:10px;color:#8b949e;line-height:1.4">Meeting notes for Q2...<br/><span style="color:#3fb950">#work #meeting</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Sidebar + Split Right</h3>
+      <p>Tasks in a persistent left sidebar. Schedule and Notes split the right side. Always visible at once.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#0d1117;border-radius:6px;font-family:monospace;font-size:12px;color:#8b949e">
+      <div style="height:140px">
+        <div style="display:flex;gap:4px;background:#161b22;border:1px solid #30363d;border-radius:4px;padding:6px;margin-bottom:6px">
+          <div style="padding:4px 10px;background:#21262d;border-radius:4px;font-size:10px;color:#58a6ff;border-bottom:2px solid #58a6ff">Tasks</div>
+          <div style="padding:4px 10px;border-radius:4px;font-size:10px;color:#8b949e">Schedule</div>
+          <div style="padding:4px 10px;border-radius:4px;font-size:10px;color:#8b949e">Notes</div>
+        </div>
+        <div style="background:#161b22;border:1px solid #30363d;border-radius:4px;padding:8px;height:100px">
+          <div style="color:#58a6ff;font-size:10px;margin-bottom:6px">TASKS — drag to reorder</div>
+          <div style="background:#21262d;border-radius:3px;padding:5px;margin-bottom:3px;font-size:10px;display:flex;justify-content:space-between">
+            <span>⠿ Task 1</span><span style="color:#3fb950;font-size:9px">work</span>
+          </div>
+          <div style="background:#21262d;border-radius:3px;padding:5px;margin-bottom:3px;font-size:10px;display:flex;justify-content:space-between">
+            <span>⠿ Task 2</span><span style="color:#f78166;font-size:9px">personal</span>
+          </div>
+          <div style="background:#21262d;border-radius:3px;padding:5px;font-size:10px;display:flex;justify-content:space-between">
+            <span>⠿ Task 3</span><span style="color:#d2a8ff;font-size:9px">study</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Tabs (Full Screen per Section)</h3>
+      <p>Three tabs: Tasks, Schedule, Notes. Each takes the full screen. Clean and focused, but you can't see all at once.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#0d1117;border-radius:6px;font-family:monospace;font-size:12px;color:#8b949e">
+      <div style="height:140px">
+        <div style="display:flex;gap:4px;background:#161b22;border:1px solid #30363d;border-radius:4px;padding:6px;margin-bottom:6px">
+          <div style="padding:4px 10px;background:#21262d;border-radius:4px;font-size:10px;color:#58a6ff;border-bottom:2px solid #58a6ff">Tasks</div>
+          <div style="padding:4px 10px;border-radius:4px;font-size:10px;color:#8b949e">Schedule</div>
+          <div style="padding:4px 10px;border-radius:4px;font-size:10px;color:#8b949e">Notes</div>
+        </div>
+        <div style="background:#161b22;border:1px solid #30363d;border-radius:4px;padding:8px;height:100px;display:flex;gap:8px">
+          <div style="flex:1">
+            <div style="color:#58a6ff;font-size:10px;margin-bottom:4px">TODAY'S FOCUS</div>
+            <div style="background:#21262d;border-radius:3px;padding:4px;margin-bottom:3px;font-size:9px">🍅 Task 1 — 2 pomodoros</div>
+            <div style="background:#21262d;border-radius:3px;padding:4px;font-size:9px">○ Task 3</div>
+          </div>
+          <div style="width:1px;background:#30363d"></div>
+          <div style="flex:1">
+            <div style="color:#58a6ff;font-size:10px;margin-bottom:4px">ALL TASKS</div>
+            <div style="background:#21262d;border-radius:3px;padding:4px;margin-bottom:3px;font-size:9px">Task 1</div>
+            <div style="background:#21262d;border-radius:3px;padding:4px;margin-bottom:3px;font-size:9px">Task 2</div>
+            <div style="background:#21262d;border-radius:3px;padding:4px;font-size:9px">Task 3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Dashboard Home + Tabs</h3>
+      <p>Home tab shows "Today's Focus" (tasks scheduled for today + active pomodoro). Full Tasks, Schedule, Notes in separate tabs. Best of both worlds.</p>
+    </div>
+  </div>
+
+</div>
