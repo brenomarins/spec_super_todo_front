@@ -1,11 +1,21 @@
 // src/features/notes/TaskChipNode.ts
 import { Node, mergeAttributes } from '@tiptap/core'
+import { ReactNodeViewRenderer } from '@tiptap/react'
+import { TaskChipView } from './TaskChipView'
 
-export const TaskChipNode = Node.create({
+export interface TaskChipNodeOptions {
+  onTaskClick: (id: string) => void
+}
+
+export const TaskChipNode = Node.create<TaskChipNodeOptions>({
   name: 'taskChip',
   group: 'inline',
   inline: true,
   atom: true,
+
+  addOptions() {
+    return { onTaskClick: () => {} }
+  },
 
   addAttributes() {
     return {
@@ -21,5 +31,9 @@ export const TaskChipNode = Node.create({
 
   renderHTML({ HTMLAttributes }) {
     return ['span', mergeAttributes(HTMLAttributes, { 'data-task-chip': '' })]
+  },
+
+  addNodeView() {
+    return ReactNodeViewRenderer(TaskChipView)
   },
 })

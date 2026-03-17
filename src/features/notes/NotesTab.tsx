@@ -20,7 +20,7 @@ export function NotesTab() {
 
   useEffect(() => {
     if (!selectedId && notes.length > 0) setSelectedId(notes[0].id)
-  }, [notes.length])
+  }, [notes, selectedId])
 
   const selectedNote = notes.find(n => n.id === selectedId) ?? null
 

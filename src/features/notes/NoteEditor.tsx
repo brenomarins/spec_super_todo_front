@@ -20,7 +20,7 @@ interface NoteEditorProps {
   onTaskClick: (id: string) => void
 }
 
-function extractLinkedTaskIds(json: string): string[] {
+export function extractLinkedTaskIds(json: string): string[] {
   try {
     const doc = JSON.parse(json)
     const ids: string[] = []
@@ -33,17 +33,17 @@ function extractLinkedTaskIds(json: string): string[] {
   } catch { return [] }
 }
 
-export function NoteEditor({ note, tags, allTags, allTasks, onSave, onTagChange, onTagCreate }: NoteEditorProps) {
+export function NoteEditor({ note, tags, allTags, allTasks, onSave, onTagChange, onTagCreate, onTaskClick }: NoteEditorProps) {
   const [title, setTitle] = useState(note.title)
 
-  useEffect(() => setTitle(note.title), [note.id])
+  useEffect(() => setTitle(note.title), [note.id, note.title])
 
   const isBig = note.content.length > ONE_MB
 
   const editor = useEditor({
     extensions: [
       StarterKit,
-      TaskChipNode,
+      TaskChipNode.configure({ onTaskClick }),
       TaskMentionExtension.configure({
         suggestion: {
           items: ({ query }) =>
