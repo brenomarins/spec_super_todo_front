@@ -6,6 +6,7 @@ interface TagStore {
   setTags: (tags: Tag[]) => void
   upsertTag: (tag: Tag) => void
   removeTag: (id: string) => void
+  addTag: (tag: Tag) => Promise<Tag>
 }
 
 export const useTagStore = create<TagStore>(set => ({
@@ -18,4 +19,5 @@ export const useTagStore = create<TagStore>(set => ({
         : [...s.tags, tag],
     })),
   removeTag: id => set(s => ({ tags: s.tags.filter(t => t.id !== id) })),
+  addTag: async (tag) => tag,
 }))

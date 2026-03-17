@@ -6,6 +6,9 @@ interface TaskStore {
   setTasks: (tasks: Task[]) => void
   upsertTask: (task: Task) => void
   removeTask: (id: string) => void
+  addTask: (task: Task) => Promise<Task>
+  updateTask: (partial: Partial<Task> & { id: string }) => Promise<void>
+  reorderTasks: (ids: string[], parentId: string | null) => Promise<void>
 }
 
 export const useTaskStore = create<TaskStore>(set => ({
@@ -18,4 +21,7 @@ export const useTaskStore = create<TaskStore>(set => ({
         : [...s.tasks, task],
     })),
   removeTask: id => set(s => ({ tasks: s.tasks.filter(t => t.id !== id) })),
+  addTask: async (task) => task,
+  updateTask: async () => {},
+  reorderTasks: async () => {},
 }))

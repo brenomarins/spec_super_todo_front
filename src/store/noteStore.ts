@@ -8,6 +8,8 @@ interface NoteStore {
   upsertNote: (note: Note) => void
   removeNote: (id: string) => void
   setActiveNoteId: (id: string | null) => void
+  addNote: (note: Note) => Promise<Note>
+  updateNote: (partial: Partial<Note> & { id: string }) => Promise<void>
 }
 
 export const useNoteStore = create<NoteStore>(set => ({
@@ -22,4 +24,6 @@ export const useNoteStore = create<NoteStore>(set => ({
     })),
   removeNote: id => set(s => ({ notes: s.notes.filter(n => n.id !== id) })),
   setActiveNoteId: id => set({ activeNoteId: id }),
+  addNote: async (note) => note,
+  updateNote: async () => {},
 }))
