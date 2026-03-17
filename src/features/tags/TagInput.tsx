@@ -14,15 +14,16 @@ export function TagInput({ allTags, selectedIds, onChange, onTagCreate }: TagInp
   const [open, setOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const selectedTags = allTags.filter(t => selectedIds.includes(t.id))
+  const selectedSet = new Set(selectedIds)
+  const selectedTags = allTags.filter(t => selectedSet.has(t.id))
   const available = allTags.filter(
-    t => !selectedIds.includes(t.id) && t.name.toLowerCase().includes(query.toLowerCase())
+    t => !selectedSet.has(t.id) && t.name.toLowerCase().includes(query.toLowerCase())
   )
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter' && query.trim()) {
       e.preventDefault()
-      const exact = allTags.find(t => t.name.toLowerCase() === query.trim().toLowerCase())
+      const exact = available.find(t => t.name.toLowerCase() === query.trim().toLowerCase())
       if (exact) {
         onChange([...selectedIds, exact.id])
       } else {

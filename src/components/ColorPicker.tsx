@@ -14,6 +14,8 @@ export function ColorPicker({ selected, onSelect }: ColorPickerProps) {
       {PRESET_COLORS.map(color => (
         <button
           key={color}
+          type="button"
+          aria-label={`Color ${color}`}
           aria-pressed={selected === color}
           onClick={() => onSelect(color)}
           style={{

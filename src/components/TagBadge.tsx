@@ -18,6 +18,7 @@ export function TagBadge({ tag, onRemove }: TagBadgeProps) {
       {tag.name}
       {onRemove && (
         <button
+          type="button"
           aria-label={`remove ${tag.name}`}
           onClick={() => onRemove(tag.id)}
           style={{ background: 'none', border: 'none', color: '#fff',
