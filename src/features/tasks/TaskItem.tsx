@@ -1,5 +1,6 @@
 import type { Task, Tag } from '../../types'
 import { TagBadge } from '../../components/TagBadge'
+import { DueDateBadge } from '../../components/DueDateBadge'
 
 interface TaskItemProps {
   task: Task
@@ -57,6 +58,7 @@ export function TaskItem({ task, tags, pomodoroCount, isActive, onClick, onToggl
           🍅 {pomodoroCount}
         </span>
       )}
+      <DueDateBadge dueDate={task.dueDate} completed={task.completed} />
       {onStartPomodoro && (
         <button
           type="button"
