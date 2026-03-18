@@ -73,3 +73,20 @@ test('shows no-tasks-today empty state when no tasks scheduled for today', () =>
   render(<HomeTab />)
   expect(screen.getByText(/nothing scheduled for today/i)).toBeInTheDocument()
 })
+
+test('renders DueDateBadge for a task with a due date', () => {
+  vi.mocked(usePomodoroStore).mockReturnValue({
+    activeSession: null, workSessionCount: 0,
+    startSession: vi.fn(), stopSession: vi.fn(),
+  } as any)
+  vi.mocked(useTaskStore).mockReturnValue({
+    tasks: [
+      { id: 't1', title: 'Morning standup', completed: false, order: 1, tagIds: [],
+        scheduledDay: '2026-03-16', dueDate: '2026-03-10', createdAt: '', updatedAt: '' },
+    ],
+  } as any)
+
+  render(<HomeTab />)
+  // dueDate '2026-03-10' is before today '2026-03-16' → overdue → shows '! Mar 10'
+  expect(screen.getByText('! Mar 10')).toBeInTheDocument()
+})

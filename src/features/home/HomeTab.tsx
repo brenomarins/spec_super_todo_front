@@ -3,6 +3,7 @@ import { useTagStore } from '../../store/tagStore'
 import { usePomodoro } from '../pomodoro/usePomodoro'
 import { PomodoroTimer } from '../pomodoro/PomodoroTimer'
 import { EmptyState } from '../../components/EmptyState'
+import { DueDateBadge } from '../../components/DueDateBadge'
 import { todayISO } from '../../lib/dateUtils'
 import type { Task } from '../../types'
 
@@ -87,6 +88,8 @@ export function HomeTab() {
                       {tag.name}
                     </span>
                   ))}
+
+                  <DueDateBadge dueDate={task.dueDate} completed={task.completed} />
 
                   <button
                     type="button"
