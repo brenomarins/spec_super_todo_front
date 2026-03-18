@@ -1,10 +1,12 @@
 // src/features/notes/NoteEditor.tsx
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { TagInput } from '../tags/TagInput'
 import { TaskChipNode } from './TaskChipNode'
 import { TaskMentionExtension } from './TaskMentionExtension'
+import { TaskPicker } from './TaskPicker'
+import { LinkedTasksPanel } from './LinkedTasksPanel'
 import type { Note, Tag, Task } from '../../types'
 
 const ONE_MB = 1_000_000
@@ -35,6 +37,14 @@ export function extractLinkedTaskIds(json: string): string[] {
 
 export function NoteEditor({ note, tags, allTags, allTasks, onSave, onTagChange, onTagCreate, onTaskClick }: NoteEditorProps) {
   const [title, setTitle] = useState(note.title)
+  const linkedTasks = allTasks.filter(t => (note.linkedTaskIds ?? []).includes(t.id))
+  const [pickerState, setPickerState] = useState<{ query: string; position: { top: number; left: number } } | null>(null)
+
+  // mutable bridge between TipTap callback and React state
+  const pickerBridge = useRef<{
+    setPickerState: typeof setPickerState
+  }>({ setPickerState: () => {} })
+  pickerBridge.current.setPickerState = setPickerState
 
   useEffect(() => setTitle(note.title), [note.id, note.title])
 
@@ -48,11 +58,30 @@ export function NoteEditor({ note, tags, allTags, allTasks, onSave, onTagChange,
         suggestion: {
           items: ({ query }) =>
             allTasks.filter(t => t.title.toLowerCase().includes(query.toLowerCase())).slice(0, 10),
-          render: () => ({ onStart: () => {}, onUpdate: () => {}, onKeyDown: () => false, onExit: () => {} }),
+          render: () => ({
+            onStart: (props: any) => {
+              const rect = props.clientRect?.()
+              if (rect) {
+                pickerBridge.current.setPickerState({
+                  query: props.query ?? '',
+                  position: { top: rect.bottom + 8, left: rect.left },
+                })
+              }
+            },
+            onUpdate: (props: any) => {
+              pickerBridge.current.setPickerState(prev =>
+                prev ? { ...prev, query: props.query ?? '' } : null
+              )
+            },
+            onKeyDown: () => false,
+            onExit: () => {
+              pickerBridge.current.setPickerState(null)
+            },
+          }),
           command: ({ editor, range, props }: any) => {
             editor.chain().focus().deleteRange(range).insertContent({
               type: 'taskChip',
-              attrs: { taskId: (props as any).id, taskTitle: (props as any).title, completed: (props as any).completed ?? false },
+              attrs: { taskId: props.id, taskTitle: props.title, completed: props.completed ?? false },
             }).run()
           },
         },
@@ -65,6 +94,16 @@ export function NoteEditor({ note, tags, allTags, allTasks, onSave, onTagChange,
       onSave({ id: note.id, content: json, linkedTaskIds })
     },
   }, [note.id])
+
+  function handlePickerSelect(task: Task) {
+    if (editor) {
+      editor.chain().focus().insertContent({
+        type: 'taskChip',
+        attrs: { taskId: task.id, taskTitle: task.title, completed: task.completed },
+      }).run()
+    }
+    setPickerState(null)
+  }
 
   return (
     <div style={{ flex: 1, padding: 20, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -91,6 +130,20 @@ export function NoteEditor({ note, tags, allTags, allTasks, onSave, onTagChange,
         editor={editor}
         style={{ flex: 1, minHeight: 300, fontSize: 14, lineHeight: 1.6 }}
       />
+
+      {pickerState && (
+        <TaskPicker
+          tasks={allTasks}
+          query={pickerState.query}
+          position={pickerState.position}
+          onSelect={handlePickerSelect}
+          onDismiss={() => setPickerState(null)}
+        />
+      )}
+
+      {linkedTasks.length > 0 && (
+        <LinkedTasksPanel tasks={linkedTasks} onTaskClick={onTaskClick} />
+      )}
     </div>
   )
 }
