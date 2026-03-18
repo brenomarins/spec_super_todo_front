@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { HomeTab } from './HomeTab'
 import { usePomodoroStore } from '../../store/pomodoroStore'
 import { useTaskStore } from '../../store/taskStore'
@@ -43,6 +43,24 @@ test('shows todays tasks scheduled for today', () => {
   render(<HomeTab />)
   expect(screen.getByText('Morning standup')).toBeInTheDocument()
   expect(screen.queryByText('Deploy release')).not.toBeInTheDocument()
+})
+
+test('🍅 button calls startSession with task id', () => {
+  const startSession = vi.fn()
+  vi.mocked(usePomodoroStore).mockReturnValue({
+    activeSession: null, workSessionCount: 0,
+    startSession, stopSession: vi.fn(),
+  } as any)
+  vi.mocked(useTaskStore).mockReturnValue({
+    tasks: [
+      { id: 't1', title: 'Morning standup', completed: false, order: 1, tagIds: [],
+        scheduledDay: '2026-03-16', createdAt: '', updatedAt: '' },
+    ],
+  } as any)
+
+  render(<HomeTab />)
+  fireEvent.click(screen.getByTitle('Start Pomodoro'))
+  expect(startSession).toHaveBeenCalledWith('t1')
 })
 
 test('shows no-tasks-today empty state when no tasks scheduled for today', () => {

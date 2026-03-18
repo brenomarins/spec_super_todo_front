@@ -12,7 +12,7 @@ export function HomeTab() {
   const { display, isRunning, activeSession, workSessionCount, startSession, stopSession } = usePomodoro()
 
   const today = todayISO()
-  const todayTasks = tasks.filter((t: Task) => t.scheduledDay === today)
+  const todayTasks = tasks.filter((t: Task) => t.scheduledDay === today && !t.parentId)
 
   const timerTaskId = activeSession?.taskId ?? null
   const timerTask = timerTaskId ? tasks.find((t: Task) => t.id === timerTaskId) ?? null : null
