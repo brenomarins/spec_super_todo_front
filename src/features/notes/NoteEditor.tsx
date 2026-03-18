@@ -38,7 +38,11 @@ export function extractLinkedTaskIds(json: string): string[] {
 export function NoteEditor({ note, tags, allTags, allTasks, onSave, onTagChange, onTagCreate, onTaskClick }: NoteEditorProps) {
   const [title, setTitle] = useState(note.title)
   const linkedTasks = allTasks.filter(t => (note.linkedTaskIds ?? []).includes(t.id))
-  const [pickerState, setPickerState] = useState<{ query: string; position: { top: number; left: number } } | null>(null)
+  const [pickerState, setPickerState] = useState<{
+    query: string
+    position: { top: number; left: number }
+    range: { from: number; to: number }
+  } | null>(null)
 
   // mutable bridge between TipTap callback and React state
   const pickerBridge = useRef<{
@@ -65,6 +69,7 @@ export function NoteEditor({ note, tags, allTags, allTasks, onSave, onTagChange,
                 pickerBridge.current.setPickerState({
                   query: props.query ?? '',
                   position: { top: rect.bottom + 8, left: rect.left },
+                  range: props.range,
                 })
               }
             },
@@ -96,8 +101,8 @@ export function NoteEditor({ note, tags, allTags, allTasks, onSave, onTagChange,
   }, [note.id])
 
   function handlePickerSelect(task: Task) {
-    if (editor) {
-      editor.chain().focus().insertContent({
+    if (editor && pickerState) {
+      editor.chain().focus().deleteRange(pickerState.range).insertContent({
         type: 'taskChip',
         attrs: { taskId: task.id, taskTitle: task.title, completed: task.completed },
       }).run()

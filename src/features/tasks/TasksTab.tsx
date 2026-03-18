@@ -94,7 +94,7 @@ export function TasksTab() {
             if (t) updateTask({ id, completed: !t.completed })
           }}
           onTaskReorder={handleReorder}
-          onStartPomodoro={startSession}
+          onStartPomodoro={(id) => startSession(id).catch(console.error)}
         />
       </div>
 
