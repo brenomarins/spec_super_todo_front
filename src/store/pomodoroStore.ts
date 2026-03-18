@@ -2,6 +2,21 @@ import { create } from 'zustand'
 import { PomodoroRepository } from '../db/repositories/PomodoroRepository'
 import { db } from '../db/db'
 
+const TWO_HOURS_MS = 2 * 60 * 60 * 1000
+
+export async function recoverStaleSession(): Promise<'active' | 'interrupted' | null> {
+  localStorage.removeItem('pomodoro:activeSession')
+  const repo = new PomodoroRepository(db)
+  const openSession = await repo.getOpenSession()
+  if (!openSession) return null
+  const age = Date.now() - Date.parse(openSession.startedAt)
+  if (age < TWO_HOURS_MS) return 'active'
+  if (openSession.type === 'work' && openSession.taskId) {
+    await repo.upsertStatsInterrupted(openSession.taskId)
+  }
+  return 'interrupted'
+}
+
 interface ActiveSession {
   taskId?: string
   sessionId: string

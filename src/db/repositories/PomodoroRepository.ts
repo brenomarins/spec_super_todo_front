@@ -97,6 +97,15 @@ export class PomodoroRepository {
     })
   }
 
+  async upsertStatsInterrupted(taskId: string): Promise<void> {
+    await this._upsertStats(taskId, stats => ({
+      ...stats,
+      totalStarted: stats.totalStarted + 1,
+      totalInterrupted: stats.totalInterrupted + 1,
+      lastSessionAt: new Date().toISOString(),
+    }))
+  }
+
   private async _upsertStats(taskId: string, updater: (s: PomodoroStats) => PomodoroStats): Promise<void> {
     const existing = await this.db.pomodoroStats.get(taskId)
     const base: PomodoroStats = existing ?? {
