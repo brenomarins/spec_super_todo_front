@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 const LS_KEY = 'pomodoro:activeSession'
 
@@ -26,13 +26,13 @@ export function useMultiTabSync() {
     return () => window.removeEventListener('storage', handler)
   }, [])
 
-  function broadcast(session: BroadcastSession) {
+  const broadcast = useCallback((session: BroadcastSession) => {
     localStorage.setItem(LS_KEY, JSON.stringify(session))
-  }
+  }, [])
 
-  function clearBroadcast() {
+  const clearBroadcast = useCallback(() => {
     localStorage.removeItem(LS_KEY)
-  }
+  }, [])
 
   return { remoteSession, broadcast, clearBroadcast }
 }

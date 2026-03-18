@@ -12,13 +12,9 @@ interface ActiveSession {
 interface PomodoroStore {
   activeSession: ActiveSession | null
   workSessionCount: number        // resets on page reload; intentional
-  secondsRemaining: number
-  isRunning: boolean
   setActiveSession: (session: ActiveSession) => void
   clearActiveSession: () => void
   incrementWorkSessionCount: () => void
-  setSecondsRemaining: (s: number) => void
-  setIsRunning: (v: boolean) => void
   startSession: (taskId: string) => Promise<void>
   stopSession: () => Promise<void>
   completeSession: () => Promise<void>
@@ -27,13 +23,9 @@ interface PomodoroStore {
 export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
   activeSession: null,
   workSessionCount: 0,
-  secondsRemaining: 0,
-  isRunning: false,
   setActiveSession: session => set({ activeSession: session }),
-  clearActiveSession: () => set({ activeSession: null, isRunning: false }),
+  clearActiveSession: () => set({ activeSession: null }),
   incrementWorkSessionCount: () => set(s => ({ workSessionCount: s.workSessionCount + 1 })),
-  setSecondsRemaining: secondsRemaining => set({ secondsRemaining }),
-  setIsRunning: isRunning => set({ isRunning }),
 
   startSession: async (taskId: string) => {
     const { activeSession } = get()

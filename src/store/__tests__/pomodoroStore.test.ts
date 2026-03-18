@@ -4,7 +4,6 @@ import { usePomodoroStore } from '../pomodoroStore'
 describe('pomodoroStore', () => {
   beforeEach(() => usePomodoroStore.setState({
     activeSession: null, workSessionCount: 0,
-    secondsRemaining: 0, isRunning: false,
   }))
 
   it('setActiveSession sets active session', () => {
