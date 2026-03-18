@@ -62,3 +62,24 @@ test('calls onUpdate with new title on blur', async () => {
   fireEvent.blur(titleInput)
   expect(onUpdate).toHaveBeenCalledWith(expect.objectContaining({ title: 'New Title' }))
 })
+
+test('renders due date input with task value', () => {
+  const taskWithDueDate: Task = { ...task, dueDate: '2026-03-25' }
+  render(<TaskDetailPanel task={taskWithDueDate} subtasks={[]} tags={[]} allTags={[]} linkedNotes={[]}
+    pomodoroStats={null} sessions={[]}
+    onClose={() => {}} onUpdate={() => {}} onAddSubtask={() => {}} onTagChange={() => {}} onTagCreate={() => {}} />)
+  expect(screen.getByDisplayValue('2026-03-25')).toBeInTheDocument()
+})
+
+test('clearing due date calls onUpdate without dueDate key', () => {
+  const onUpdate = vi.fn()
+  const taskWithDueDate: Task = { ...task, dueDate: '2026-03-25' }
+  render(<TaskDetailPanel task={taskWithDueDate} subtasks={[]} tags={[]} allTags={[]} linkedNotes={[]}
+    pomodoroStats={null} sessions={[]}
+    onClose={() => {}} onUpdate={onUpdate} onAddSubtask={() => {}} onTagChange={() => {}} onTagCreate={() => {}} />)
+  const dueDateInput = screen.getByDisplayValue('2026-03-25')
+  fireEvent.change(dueDateInput, { target: { value: '' } })
+  expect(onUpdate).toHaveBeenCalledWith(
+    expect.not.objectContaining({ dueDate: expect.anything() })
+  )
+})

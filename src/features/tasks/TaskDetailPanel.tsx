@@ -83,6 +83,17 @@ export function TaskDetailPanel({
       </div>
 
       <div>
+        <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginBottom: 6, textTransform: 'uppercase' }}>Due Date</div>
+        <input
+          type="date"
+          value={task.dueDate ?? ''}
+          onChange={e => onUpdate({ id: task.id, dueDate: e.target.value || undefined })}
+          style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 6,
+            color: 'var(--color-text)', padding: '5px 8px', fontSize: 13, outline: 'none' }}
+        />
+      </div>
+
+      <div>
         <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginBottom: 6, textTransform: 'uppercase' }}>Subtasks</div>
         {subtasks.map(sub => (
           <SubtaskItem key={sub.id} task={sub} onClick={() => {}} onToggle={(id) => onUpdate({ id, completed: !sub.completed })} />
