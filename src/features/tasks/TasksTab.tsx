@@ -20,6 +20,7 @@ export function TasksTab() {
 
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
   const [filterTagId, setFilterTagId] = useState<string | null>(null)
+  const [overdueOnly, setOverdueOnly] = useState(false)
 
   const topLevelTasks = tasks.filter((t: Task) => !t.parentId)
   const subtasks = tasks.filter((t: Task) => !!t.parentId)
@@ -81,7 +82,13 @@ export function TasksTab() {
     <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
       <div style={{ flex: 1, padding: 16, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
         <AddTaskInput onAdd={handleAddTask} />
-        <TagFilter tags={tags} selectedId={filterTagId} onSelect={setFilterTagId} />
+        <TagFilter
+          tags={tags}
+          selectedId={filterTagId}
+          onSelect={setFilterTagId}
+          overdueOnly={overdueOnly}
+          onOverdueToggle={() => setOverdueOnly(o => !o)}
+        />
         <TaskList
           tasks={filteredTopLevel}
           subtasks={subtasks}
@@ -95,6 +102,7 @@ export function TasksTab() {
           }}
           onTaskReorder={handleReorder}
           onStartPomodoro={(id) => startSession(id).catch(console.error)}
+          overdueOnly={overdueOnly}
         />
       </div>
 
