@@ -122,3 +122,17 @@ test('renders subtasks under parent in dated group', () => {
     onTaskClick={() => {}} onTaskToggle={() => {}} overdueOnly={false} />)
   expect(screen.getByText('Child')).toBeInTheDocument()
 })
+
+test('pre-filtered tasks appear in correct groups (tag filter)', () => {
+  // Simulate TasksTab pre-filtering: only pass tasks that match the tag filter
+  const tasks: Task[] = [
+    { ...base, id: 't1', title: 'Tagged overdue', order: 1, dueDate: '2026-03-10', tagIds: ['tag1'] },
+    { ...base, id: 't2', title: 'Tagged no date', order: 2, tagIds: ['tag1'] },
+  ]
+  render(<TaskList tasks={tasks} subtasks={[]} tags={[]} pomodoroStats={{}} activeTaskId={null}
+    onTaskClick={() => {}} onTaskToggle={() => {}} overdueOnly={false} />)
+  expect(screen.getByText('Tagged overdue')).toBeInTheDocument()
+  expect(screen.getAllByText(/OVERDUE/i).length).toBeGreaterThan(0)
+  expect(screen.getByText('Tagged no date')).toBeInTheDocument()
+  expect(screen.getByText(/NO DUE DATE/i)).toBeInTheDocument()
+})

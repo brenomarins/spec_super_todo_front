@@ -134,12 +134,11 @@ export function TaskList({
   const pomodoroCount = (t: Task) => pomodoroStats[t.id]?.totalCompleted ?? 0
   const isActive = (t: Task) => activeTaskId === t.id
 
-  if (allEmpty) {
-    return <EmptyState message="No tasks yet. Add one above." />
-  }
-
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      {allEmpty ? (
+        <EmptyState message="No tasks yet. Add one above." />
+      ) : (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 
         {overdue.length > 0 && (
@@ -205,6 +204,7 @@ export function TaskList({
         )}
 
       </div>
+      )}
     </DndContext>
   )
 }
