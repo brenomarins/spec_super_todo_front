@@ -34,6 +34,15 @@ test('TaskItem calls onClick when row clicked', () => {
   expect(onClick).toHaveBeenCalledWith('t1')
 })
 
+test('renders 🍅 start button and calls onStartPomodoro when clicked', () => {
+  const onStartPomodoro = vi.fn()
+  render(<TaskItem task={task} tags={[tag]} pomodoroCount={0} onClick={() => {}} onToggle={() => {}}
+    onStartPomodoro={onStartPomodoro} dragHandleProps={null} />)
+  const btn = screen.getByRole('button', { name: /start pomodoro/i })
+  fireEvent.click(btn)
+  expect(onStartPomodoro).toHaveBeenCalledWith(task.id)
+})
+
 test('SubtaskItem renders with completed strikethrough', () => {
   const subtask = { ...task, id: 'st1', completed: true, parentId: 't1' }
   render(<SubtaskItem task={subtask} onClick={() => {}} onToggle={() => {}} />)

@@ -8,10 +8,11 @@ interface TaskItemProps {
   isActive?: boolean
   onClick: (id: string) => void
   onToggle: (id: string) => void
+  onStartPomodoro?: (id: string) => void
   dragHandleProps: Record<string, unknown> | null
 }
 
-export function TaskItem({ task, tags, pomodoroCount, isActive, onClick, onToggle, dragHandleProps }: TaskItemProps) {
+export function TaskItem({ task, tags, pomodoroCount, isActive, onClick, onToggle, onStartPomodoro, dragHandleProps }: TaskItemProps) {
   const taskTags = tags.filter(t => task.tagIds.includes(t.id))
 
   return (
@@ -55,6 +56,20 @@ export function TaskItem({ task, tags, pomodoroCount, isActive, onClick, onToggl
         <span style={{ fontSize: 12, color: 'var(--color-warning)', whiteSpace: 'nowrap' }}>
           🍅 {pomodoroCount}
         </span>
+      )}
+      {onStartPomodoro && (
+        <button
+          type="button"
+          aria-label="start pomodoro"
+          onClick={(e) => { e.stopPropagation(); onStartPomodoro(task.id) }}
+          title="Start Pomodoro"
+          style={{ background: 'none', border: 'none', cursor: 'pointer',
+            fontSize: 16, padding: '2px 4px', opacity: 0.5, lineHeight: 1 }}
+          onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+          onMouseLeave={e => (e.currentTarget.style.opacity = '0.5')}
+        >
+          🍅
+        </button>
       )}
     </div>
   )

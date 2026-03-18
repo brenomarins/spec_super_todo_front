@@ -13,7 +13,7 @@ import type { Task, PomodoroStats, PomodoroSession } from '../../types'
 export function TasksTab() {
   const { tasks, addTask, updateTask, reorderTasks } = useTaskStore()
   const { tags, addTag } = useTagStore()
-  const { activeSession } = usePomodoroStore()
+  const { activeSession, startSession } = usePomodoroStore()
   // stats and sessions wired in Tasks 32-34 (Pomodoro feature)
   const stats: Record<string, PomodoroStats> = {}
   const sessions: Record<string, PomodoroSession[]> = {}
@@ -94,6 +94,7 @@ export function TasksTab() {
             if (t) updateTask({ id, completed: !t.completed })
           }}
           onTaskReorder={handleReorder}
+          onStartPomodoro={startSession}
         />
       </div>
 

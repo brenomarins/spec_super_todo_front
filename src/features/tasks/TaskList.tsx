@@ -20,11 +20,13 @@ interface TaskListProps {
   onTaskClick: (id: string) => void
   onTaskToggle: (id: string) => void
   onTaskReorder: (ids: string[]) => void
+  onStartPomodoro?: (id: string) => void
 }
 
 function SortableTaskItem(props: {
   task: Task; tags: Tag[]; pomodoroCount: number; isActive: boolean; subtasks: Task[];
-  onTaskClick: (id: string) => void; onTaskToggle: (id: string) => void
+  onTaskClick: (id: string) => void; onTaskToggle: (id: string) => void;
+  onStartPomodoro?: (id: string) => void
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: props.task.id })
   const style = { transform: CSS.Transform.toString(transform), transition }
@@ -40,6 +42,7 @@ function SortableTaskItem(props: {
         isActive={props.isActive}
         onClick={props.onTaskClick}
         onToggle={props.onTaskToggle}
+        onStartPomodoro={props.onStartPomodoro}
         dragHandleProps={{ ...attributes, ...listeners }}
       />
       {taskSubtasks.length > 0 && (
@@ -54,7 +57,7 @@ function SortableTaskItem(props: {
 }
 
 export function TaskList({ tasks, subtasks, tags, pomodoroStats, activeTaskId,
-  onTaskClick, onTaskToggle, onTaskReorder }: TaskListProps) {
+  onTaskClick, onTaskToggle, onTaskReorder, onStartPomodoro }: TaskListProps) {
   const sensors = useSensors(useSensor(PointerSensor))
   const sorted = [...tasks].sort((a, b) => a.order - b.order)
 
@@ -87,6 +90,7 @@ export function TaskList({ tasks, subtasks, tags, pomodoroStats, activeTaskId,
               subtasks={subtasks}
               onTaskClick={onTaskClick}
               onTaskToggle={onTaskToggle}
+              onStartPomodoro={onStartPomodoro}
             />
           ))}
         </div>
