@@ -2,6 +2,7 @@
 import { useDraggable } from '@dnd-kit/core'
 import type { Task, Tag } from '../../types'
 import { TagBadge } from '../../components/TagBadge'
+import { DueDateBadge } from '../../components/DueDateBadge'
 
 interface ScheduleTaskCardProps {
   task: Task
@@ -37,9 +38,10 @@ export function ScheduleTaskCard({ task, tags, onClick, onRemoveDay }: ScheduleT
         >
           {task.title}
         </div>
-        {taskTags.length > 0 && (
-          <div style={{ display: 'flex', gap: 3, marginTop: 3, flexWrap: 'wrap' }}>
+        {(taskTags.length > 0 || task.dueDate) && (
+          <div style={{ display: 'flex', gap: 3, marginTop: 3, flexWrap: 'wrap', alignItems: 'center' }}>
             {taskTags.map(tag => <TagBadge key={tag.id} tag={tag} />)}
+            <DueDateBadge dueDate={task.dueDate} completed={task.completed} />
           </div>
         )}
       </div>
