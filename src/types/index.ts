@@ -8,6 +8,7 @@ export interface Task {
   order: number
   tagIds: string[]
   scheduledDay?: string       // ISO date YYYY-MM-DD
+  dueDate?: string            // ISO date YYYY-MM-DD — deadline, independent of scheduledDay
   createdAt: string
   updatedAt: string
 }

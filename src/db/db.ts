@@ -19,6 +19,9 @@ export class TimeManagerDB extends Dexie {
       pomodoroSessions: 'id, taskId, startedAt, completedAt, isOpen',
       pomodoroStats: 'taskId',
     })
+    this.version(2).stores({
+      tasks: 'id, parentId, scheduledDay, dueDate, order, *tagIds',
+    })
   }
 }
 
