@@ -29,3 +29,19 @@ test('shows RecoveryScreen when DB fails to open', async () => {
     expect(screen.getByText(/storage error/i)).toBeInTheDocument()
   })
 })
+
+test('renders Stats tab button', async () => {
+  render(<App />)
+  await waitFor(() => {
+    expect(screen.getByText('Stats')).toBeInTheDocument()
+  })
+})
+
+test('switches to Stats tab on click', async () => {
+  render(<App />)
+  await waitFor(() => screen.getByText('Stats'))
+  fireEvent.click(screen.getByText('Stats'))
+  await waitFor(() => {
+    expect(screen.getByTestId('stats-tab')).toBeInTheDocument()
+  })
+})

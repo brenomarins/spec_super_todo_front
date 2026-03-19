@@ -6,6 +6,7 @@ import { HomeTab } from './features/home/HomeTab'
 import { TasksTab } from './features/tasks/TasksTab'
 import { ScheduleTab } from './features/schedule/ScheduleTab'
 import { NotesTab } from './features/notes/NotesTab'
+import { StatsTab } from './features/stats/StatsTab'
 import { useTaskStore } from './store/taskStore'
 import { useTagStore } from './store/tagStore'
 import { useNoteStore } from './store/noteStore'
@@ -81,6 +82,7 @@ export default function App() {
           {tab === 'tasks' && <TasksTab />}
           {tab === 'schedule' && <ScheduleTab />}
           {tab === 'notes' && <NotesTab />}
+          {tab === 'stats' && <StatsTab />}
         </main>
       </div>
     </ToastProvider>
