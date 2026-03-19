@@ -23,6 +23,9 @@ This document defines the HTTP API contract for a backend that replaces the curr
 - **Action endpoints for Pomodoro** — explicit `complete` and `interrupt` actions instead of generic PATCH, enforcing the session state machine
 - **Stats computed server-side** — `GET /stats` returns pre-aggregated data, matching the shape `useStatsData` currently returns
 - **Cascade deletes** — `DELETE /tasks/{id}` removes its sessions and stats; `DELETE /tags/{id}` removes the tag from all tasks and notes
+- **One open session at a time** — the server enforces a single active session (isOpen=1). Starting a new work or break session when one is already open is a client error (409 Conflict). The client must interrupt or complete the current session first.
+- **`GET /tags/{id}` omitted** — intentional. The frontend always fetches all tags at startup; individual tag lookup is not needed.
+- **Stats re-fetch after session close** — `POST /sessions/{id}/complete` and `POST /sessions/{id}/interrupt` return 204. Stats counters are updated server-side; callers that need fresh stats must re-fetch `GET /stats` or `GET /tasks/{id}/stats`.
 
 ---
 
@@ -85,6 +88,12 @@ paths:
       responses:
         '204':
           description: Reordered
+        '422':
+          description: One or more task IDs in orderedIds do not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /tasks/{id}:
     parameters:
@@ -339,6 +348,10 @@ paths:
     get:
       summary: Get the currently active session (if any)
       operationId: getOpenSession
+      description: >
+        Always returns 200. Body is the open PomodoroSession object when one
+        exists, or JSON null when no session is active. The server normalizes
+        the absence of an open session to null (never undefined or 404).
       responses:
         '200':
           description: Open session or null
@@ -353,6 +366,10 @@ paths:
     post:
       summary: Start a 25-minute work session
       operationId: startWorkSession
+      description: >
+        Creates a new work session with isOpen=1 and durationMinutes=25.
+        Side effect: increments totalStarted in PomodoroStats for the given taskId.
+        Returns 409 if another session is already open (isOpen=1).
       requestBody:
         required: true
         content:
@@ -370,11 +387,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PomodoroSession'
+        '409':
+          description: Another session is already open
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /sessions/break:
     post:
       summary: Start a break session
       operationId: startBreakSession
+      description: >
+        Creates a new break session (short_break=5min, long_break=15min) with isOpen=1.
+        Returns 409 if another session is already open (isOpen=1).
       requestBody:
         required: true
         content:
@@ -395,6 +421,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PomodoroSession'
+        '409':
+          description: Another session is already open
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /sessions/{id}/complete:
     parameters:
@@ -707,7 +739,9 @@ components:
           type: string
           format: date-time
           nullable: true
-          description: null = active or interrupted
+          description: >
+            Disambiguate using isOpen: null + isOpen=1 means active (in progress);
+            null + isOpen=0 means interrupted (abandoned); non-null + isOpen=0 means completed.
         type:
           type: string
           enum: [work, short_break, long_break]
@@ -759,6 +793,10 @@ components:
           description: completed / (completed + interrupted); null when no sessions
         weeklyTrend:
           type: array
+          description: >
+            all: 8 entries, label is ISO week start formatted "MMM d" (e.g. "Mar 17");
+            week: 7 entries Mon–Sun, label is day abbreviation (e.g. "Mon");
+            today: 24 entries, label is stringified hour "0"–"23".
           items:
             type: object
             required: [label, hours]
@@ -827,6 +865,7 @@ components:
 | POST | /tags | Create tag |
 | PATCH | /tags/{id} | Update tag |
 | DELETE | /tags/{id} | Delete tag (cascade) |
+| ~~GET~~ | ~~GET /tags/{id}~~ | ~~Intentionally omitted — frontend always loads all tags~~ |
 | GET | /notes | List all notes |
 | POST | /notes | Create note |
 | GET | /notes/{id} | Get note |
