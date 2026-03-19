@@ -8,7 +8,9 @@ Add a **Stats** tab to the app where the user can review their productivity: how
 
 The app already records every pomodoro session in `PomodoroSessions` (Dexie table) and maintains per-task aggregates in `PomodoroStats`. No new data collection is needed — the dashboard is purely a read/display layer over existing data.
 
-Sessions have `type: 'work' | 'short_break' | 'long_break'`. Only `work` sessions are counted for all stats. A session is **completed** when `completedAt !== null`; **interrupted** when `completedAt === null` and `isOpen === 0`. "Focused time" = sum of `durationMinutes` for completed work sessions (consistent with how `totalMinutesFocused` is computed in `PomodoroStats`).
+Sessions have `type: 'work' | 'short_break' | 'long_break'`. Only `work` sessions are counted for all stats. A session is **completed** when `completedAt !== null`; **interrupted** when `completedAt === null` and `isOpen === 0`; **open/active** when `isOpen === 1`. "Focused time" = sum of `durationMinutes` for completed work sessions (consistent with how `totalMinutesFocused` is computed in `PomodoroStats`).
+
+**Open sessions are excluded from all stats.** An in-progress session is neither completed nor interrupted and does not contribute to any count or focused-time total until it resolves.
 
 ---
 
@@ -87,13 +89,13 @@ Each row:
 
 | Column | Value |
 |---|---|
-| Task title | From task store; `"(deleted task)"` if task no longer exists |
-| Focused | `Xh Ym` from `totalMinutesFocused` |
-| Completed | `totalCompleted` |
-| Interrupted | `totalInterrupted` |
-| Stop rate | `totalInterrupted / totalStarted` as `X%`; `—` if zero |
+| Task title | From task store by `taskId`; if the task is not found, skip the row (tasks are deleted alongside their sessions and stats via `deleteByTaskId`, so orphaned stats cannot occur in normal operation) |
+| Focused | `Xh Ym` from `minutesFocused` |
+| Completed | `completed` count |
+| Interrupted | `interrupted` count |
+| Stop rate | `interrupted / started` as `X%`; `—` when `started === 0` |
 
-**Time filter:** When "This week" or "Today" is active, per-task numbers are re-computed from sessions (not from `PomodoroStats`), grouped by `taskId`.
+**Time filter:** When "This week" or "Today" is active, per-task numbers are re-computed from sessions (not from `PomodoroStats`), grouped by `taskId`. Only sessions with `type === 'work'`, `completedAt !== null` (for focused time and completed count), or `completedAt === null` and `isOpen === 0` (for interrupted count) are considered. Sessions with `taskId` undefined are excluded from the By Task list entirely; they are also excluded from Overview totals since work sessions always have a `taskId` set.
 
 Subtasks are included — each has its own `PomodoroStats` entry and appears as a separate row with its own title.
 
@@ -149,9 +151,9 @@ function useStatsData(filter: TimeFilter): StatsData
 
 **Implementation strategy:**
 
-- For `filter === 'all'`: aggregate from `PomodoroStats` table (fast, pre-computed). Query sessions only for chart data (weekly trend, daily).
-- For `filter === 'week'` or `'today'`: query `PomodoroSessions` directly, filter by date range, compute all aggregates in-memory.
-- Task titles are resolved by joining with `useTaskStore().tasks`.
+- For `filter === 'all'`: aggregate from `PomodoroStats` table (fast, pre-computed). Query sessions only for chart data (weekly trend, daily focus).
+- For `filter === 'week'` or `'today'`: query `PomodoroSessions` directly, filter by date range, compute all aggregates in-memory. In both paths, when computing from sessions: only `type === 'work'` sessions are considered; only `completedAt !== null` sessions contribute to focused time and completed count; only `completedAt === null && isOpen === 0` sessions contribute to interrupted count; `isOpen === 1` (active) sessions are excluded entirely.
+- Task titles are resolved by joining with `useTaskStore().tasks`. Tasks not found in the store are skipped (their sessions and stats are deleted alongside the task).
 - The hook uses `useState` + `useEffect` with an async Dexie query. Re-runs when `filter` changes.
 
 ---
@@ -204,9 +206,9 @@ function formatMinutes(minutes: number): string {
 
 ## Testing Strategy
 
-- **`useStatsData`**: unit tests with mocked Dexie — verify aggregation logic for each filter mode; verify deleted-task handling; verify `completionRate` is `null` when no sessions
+- **`useStatsData`**: unit tests with mocked Dexie — verify aggregation logic for each filter mode; verify open sessions are excluded; verify `completionRate` is `null` when no sessions; verify tasks not in the store are skipped
 - **`StatsOverview`**: unit test — renders correct card values given mocked `StatsData`; chart renders without crashing (no assertions on SVG internals)
-- **`StatsByTask`**: unit test — tasks sorted by minutes focused descending; deleted task shown as "(deleted task)"; stop rate shown as `—` when zero
+- **`StatsByTask`**: unit test — tasks sorted by minutes focused descending; stop rate shown as `—` when `started === 0`
 - **`StatsByDay`**: unit test — correct number of bars for each filter mode; chart renders without crashing
 - **`StatsTab`**: unit test — time filter buttons change active state; sub-tab buttons switch visible content
 
