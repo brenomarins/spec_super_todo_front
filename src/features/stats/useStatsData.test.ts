@@ -96,3 +96,47 @@ test('all-time: tasks not in store are skipped', async () => {
   await waitFor(() => expect(result.current.totalMinutesFocused).toBe(75))
   expect(result.current.taskStats).toHaveLength(0)
 })
+
+// ── all-time: chart data shapes ──────────────────────────────────────────────
+
+test('all-time: weeklyTrend has 8 entries (one per ISO week)', async () => {
+  const { result } = renderHook(() => useStatsData('all'))
+  await waitFor(() => expect(result.current.weeklyTrend).toHaveLength(8))
+})
+
+test('all-time: dailyFocus has 30 entries (one per calendar day)', async () => {
+  const { result } = renderHook(() => useStatsData('all'))
+  await waitFor(() => expect(result.current.dailyFocus).toHaveLength(30))
+})
+
+test('all-time: completed work session minutes appear in weeklyTrend', async () => {
+  vi.mocked(useTaskStore).mockReturnValue({ tasks: [] } as any)
+  // Seed a completed work session for today
+  const today = new Date()
+  await db.pomodoroSessions.add({
+    id: 's1', taskId: 't1',
+    startedAt: today.toISOString(),
+    completedAt: today.toISOString(),
+    type: 'work', durationMinutes: 25, isOpen: 0,
+  })
+  const { result } = renderHook(() => useStatsData('all'))
+  await waitFor(() => {
+    const total = result.current.weeklyTrend.reduce((s, w) => s + w.hours, 0)
+    expect(total).toBeCloseTo(25 / 60)
+  })
+})
+
+test('all-time: open sessions (isOpen=1) excluded from charts', async () => {
+  vi.mocked(useTaskStore).mockReturnValue({ tasks: [] } as any)
+  const today = new Date()
+  await db.pomodoroSessions.add({
+    id: 's-open', taskId: 't1',
+    startedAt: today.toISOString(),
+    completedAt: null,
+    type: 'work', durationMinutes: 25, isOpen: 1, // active session
+  })
+  const { result } = renderHook(() => useStatsData('all'))
+  await waitFor(() => expect(result.current.weeklyTrend).toHaveLength(8))
+  const total = result.current.weeklyTrend.reduce((s, w) => s + w.hours, 0)
+  expect(total).toBe(0)
+})
