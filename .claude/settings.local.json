@@ -25,11 +25,30 @@
       "Bash(npx create-vite@latest --help)",
       "Bash(npx create-vite@latest . --template react-ts --no-interactive)",
       "Bash(npx:*)",
+      "Bash(sed:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
       "Bash(cp:*)",
+      "Bash(cd:*)",
+      "Bash(git:*)",
+      "Bash(find:*)",
       "Bash(npm install:*)",
       "Bash(npm run:*)",
       "Bash(ls E:/codigos/spec_super_todo_front/node_modules/vitest/dist/*.d.ts)",
-      "Bash(ls E:/codigos/spec_super_todo_front/node_modules/vitest/*.d.ts)"
+      "Bash(ls E:/codigos/spec_super_todo_front/node_modules/vitest/*.d.ts)",
+      "Bash(npm test:*)",
+      "Bash(git -C /e/codigos/spec_super_todo_front log --oneline cf30b1b..b151ddd)",
+      "Bash(git -C /e/codigos/spec_super_todo_front log --oneline -7)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(find E:/codigos/spec_super_todo_front/node_modules/@testing-library/jest-dom -name *.js)",
+      "Bash(grep -r border E:/codigos/spec_super_todo_front/node_modules/jsdom/lib/jsdom/living/helpers/stylesheets*.js)",
+      "Bash(find E:/codigos/spec_super_todo_front/node_modules/jsdom/lib -name CSSStyleDeclaration*)",
+      "Bash(xargs grep:*)",
+      "Bash(find E:/codigos/spec_super_todo_front/node_modules/jsdom/lib/generated -name css-property-descriptors*)",
+      "Bash(npm list:*)",
+      "Bash(find /e/codigos/spec_super_todo_front/src -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))"
     ]
   }
 }
