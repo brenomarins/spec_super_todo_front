@@ -118,8 +118,87 @@ export function useStatsData(filter: TimeFilter): StatsData {
             completionRate, weeklyTrend, taskStats, dailyFocus })
         }
       } else {
-        // week / today: compute from sessions (Task 4)
-        if (!cancelled) setData(EMPTY)
+        // filter === 'week' or 'today': query sessions directly
+        const weekDays = filter === 'week'
+          ? getWeekDays(new Date())
+          : [todayISO()]
+        const startBound = weekDays[0]
+        const endBound = weekDays[weekDays.length - 1] + '\uffff'
+
+        const sessions = await db.pomodoroSessions
+          .where('startedAt')
+          .between(startBound, endBound, true, true)
+          .filter(s => s.type === 'work' && s.isOpen === 0)
+          .toArray()
+
+        const completed = sessions.filter(s => s.completedAt !== null)
+        const interrupted = sessions.filter(s => s.completedAt === null)
+        const totalMinutesFocused = completed.reduce((s, r) => s + r.durationMinutes, 0)
+        const totalCompleted = completed.length
+        const totalInterrupted = interrupted.length
+        const total = totalCompleted + totalInterrupted
+        const completionRate = total === 0 ? null : totalCompleted / total
+
+        // taskStats grouped by taskId (only sessions with a taskId)
+        const taskIds = [...new Set(sessions.filter(s => s.taskId).map(s => s.taskId!))]
+        const taskStats = taskIds
+          .filter(id => taskMap.has(id))
+          .map(id => {
+            const forTask = sessions.filter(s => s.taskId === id)
+            const taskCompleted = forTask.filter(s => s.completedAt !== null)
+            const taskInterrupted = forTask.filter(s => s.completedAt === null)
+            return {
+              taskId: id,
+              title: taskMap.get(id)!,
+              minutesFocused: taskCompleted.reduce((s, r) => s + r.durationMinutes, 0),
+              completed: taskCompleted.length,
+              interrupted: taskInterrupted.length,
+              started: taskCompleted.length + taskInterrupted.length,
+            }
+          })
+          .sort((a, b) => b.minutesFocused - a.minutesFocused)
+
+        let weeklyTrend: { label: string; hours: number }[]
+        let dailyFocus: { date: string; hours: number }[]
+
+        if (filter === 'week') {
+          // One bar per day Mon–Sun
+          const fullWeek = getWeekDays(new Date())
+          weeklyTrend = fullWeek.map(day => {
+            const dayCompleted = completed.filter(s => s.startedAt.slice(0, 10) === day)
+            return {
+              label: dayAbbr(day),
+              hours: dayCompleted.reduce((s, r) => s + r.durationMinutes, 0) / 60,
+            }
+          })
+          dailyFocus = fullWeek.map(day => {
+            const dayCompleted = completed.filter(s => s.startedAt.slice(0, 10) === day)
+            return {
+              date: day,
+              hours: dayCompleted.reduce((s, r) => s + r.durationMinutes, 0) / 60,
+            }
+          })
+        } else {
+          // filter === 'today': one bar per hour 0–23
+          const hourlyMinutes = Array.from({ length: 24 }, () => 0)
+          for (const s of completed) {
+            const hour = new Date(s.startedAt).getHours()
+            hourlyMinutes[hour] += s.durationMinutes
+          }
+          weeklyTrend = hourlyMinutes.map((mins, h) => ({
+            label: String(h),
+            hours: mins / 60,
+          }))
+          dailyFocus = hourlyMinutes.map((mins, h) => ({
+            date: String(h),
+            hours: mins / 60,
+          }))
+        }
+
+        if (!cancelled) {
+          setData({ totalMinutesFocused, totalCompleted, totalInterrupted,
+            completionRate, weeklyTrend, taskStats, dailyFocus })
+        }
       }
     }
 

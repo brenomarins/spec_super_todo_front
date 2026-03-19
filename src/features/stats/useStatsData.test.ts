@@ -140,3 +140,94 @@ test('all-time: open sessions (isOpen=1) excluded from charts', async () => {
   const total = result.current.weeklyTrend.reduce((s, w) => s + w.hours, 0)
   expect(total).toBe(0)
 })
+
+// ── week filter ──────────────────────────────────────────────────────────────
+
+test('week: weeklyTrend has 7 entries (Mon–Sun)', async () => {
+  const { result } = renderHook(() => useStatsData('week'))
+  await waitFor(() => expect(result.current.weeklyTrend).toHaveLength(7))
+})
+
+test('week: dailyFocus has 7 entries', async () => {
+  const { result } = renderHook(() => useStatsData('week'))
+  await waitFor(() => expect(result.current.dailyFocus).toHaveLength(7))
+})
+
+test('week: counts completed sessions in date range', async () => {
+  vi.mocked(useTaskStore).mockReturnValue({
+    tasks: [{ id: 't1', title: 'T' } as any],
+  } as any)
+  const { getWeekDays } = await import('../../lib/dateUtils')
+  const weekDays = getWeekDays(new Date())
+  const monday = weekDays[0]
+
+  await db.pomodoroSessions.bulkAdd([
+    { id: 's1', taskId: 't1', startedAt: monday + 'T10:00:00.000Z',
+      completedAt: monday + 'T10:25:00.000Z', type: 'work', durationMinutes: 25, isOpen: 0 },
+    { id: 's2', taskId: 't1', startedAt: monday + 'T11:00:00.000Z',
+      completedAt: null, type: 'work', durationMinutes: 25, isOpen: 0 }, // interrupted
+    // open session — excluded
+    { id: 's3', taskId: 't1', startedAt: monday + 'T12:00:00.000Z',
+      completedAt: null, type: 'work', durationMinutes: 25, isOpen: 1 },
+  ])
+  const { result } = renderHook(() => useStatsData('week'))
+  await waitFor(() => expect(result.current.totalCompleted).toBe(1))
+  expect(result.current.totalInterrupted).toBe(1)
+  expect(result.current.totalMinutesFocused).toBe(25)
+})
+
+test('week: completionRate is null when no closed sessions', async () => {
+  const { result } = renderHook(() => useStatsData('week'))
+  await waitFor(() => expect(result.current.completionRate).toBeNull())
+})
+
+test('week: task stats computed from sessions (not PomodoroStats)', async () => {
+  vi.mocked(useTaskStore).mockReturnValue({
+    tasks: [{ id: 't1', title: 'Task A' } as any],
+  } as any)
+  const { getWeekDays } = await import('../../lib/dateUtils')
+  const weekDays = getWeekDays(new Date())
+  const monday = weekDays[0]
+
+  await db.pomodoroSessions.bulkAdd([
+    { id: 'w1', taskId: 't1', startedAt: monday + 'T09:00:00.000Z',
+      completedAt: monday + 'T09:25:00.000Z', type: 'work', durationMinutes: 25, isOpen: 0 },
+    { id: 'w2', taskId: 't1', startedAt: monday + 'T10:00:00.000Z',
+      completedAt: null, type: 'work', durationMinutes: 25, isOpen: 0 },
+  ])
+  const { result } = renderHook(() => useStatsData('week'))
+  await waitFor(() => expect(result.current.taskStats).toHaveLength(1))
+  expect(result.current.taskStats[0].title).toBe('Task A')
+  expect(result.current.taskStats[0].minutesFocused).toBe(25)
+  expect(result.current.taskStats[0].completed).toBe(1)
+  expect(result.current.taskStats[0].interrupted).toBe(1)
+  expect(result.current.taskStats[0].started).toBe(2)
+})
+
+test('week: open sessions excluded entirely', async () => {
+  vi.mocked(useTaskStore).mockReturnValue({ tasks: [] } as any)
+  const { getWeekDays } = await import('../../lib/dateUtils')
+  const weekDays = getWeekDays(new Date())
+  const monday = weekDays[0]
+
+  await db.pomodoroSessions.add({
+    id: 'open1', taskId: 't1', startedAt: monday + 'T10:00:00.000Z',
+    completedAt: null, type: 'work', durationMinutes: 25, isOpen: 1,
+  })
+  const { result } = renderHook(() => useStatsData('week'))
+  await waitFor(() => expect(result.current.weeklyTrend).toHaveLength(7))
+  expect(result.current.totalCompleted).toBe(0)
+  expect(result.current.totalInterrupted).toBe(0)
+})
+
+// ── today filter ─────────────────────────────────────────────────────────────
+
+test('today: weeklyTrend has 24 entries (hourly)', async () => {
+  const { result } = renderHook(() => useStatsData('today'))
+  await waitFor(() => expect(result.current.weeklyTrend).toHaveLength(24))
+})
+
+test('today: dailyFocus has 24 entries', async () => {
+  const { result } = renderHook(() => useStatsData('today'))
+  await waitFor(() => expect(result.current.dailyFocus).toHaveLength(24))
+})
