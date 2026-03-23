@@ -11,7 +11,9 @@ The frontend currently reads and writes all data through a Dexie (IndexedDB) lay
 
 **Approach:** API client module (`src/api/`) with per-resource files. Stores replace repository calls with API calls. IndexedDB and all repository code is deleted.
 
-**Reference:** The full OpenAPI 3.0 contract for the backend is documented in [`docs/superpowers/specs/2026-03-19-backend-api-design.md`](./2026-03-19-backend-api-design.md). This document is the authoritative source for all endpoint paths, request/response shapes, status codes, and edge cases (e.g. 409 on duplicate open session, cascade delete behavior). Implementors should consult it for every `apiFetch` call they write.
+**References:**
+- **`swagger.json`** (repo root) — the backend-generated OpenAPI 3.1.0 spec exported from the running server (`http://localhost:8091`). This is the **primary reference** for all endpoint paths, exact request/response field names, status codes, and schema shapes. Use this when implementing every function in `src/api/`.
+- [`docs/superpowers/specs/2026-03-19-backend-api-design.md`](./2026-03-19-backend-api-design.md) — the hand-written design doc; useful for understanding intent and edge cases (409 on duplicate open session, cascade delete behavior, stale session recovery logic) but `swagger.json` takes precedence on schema details.
 
 ---
 
