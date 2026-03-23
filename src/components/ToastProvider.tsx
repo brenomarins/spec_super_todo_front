@@ -11,6 +11,14 @@ export function useToast() {
   return useContext(ToastContext)
 }
 
+let _showGlobalToast: (msg: string) => void = () => {}
+export function registerGlobalToast(fn: (msg: string) => void) {
+  _showGlobalToast = fn
+}
+export function showGlobalToast(msg: string) {
+  _showGlobalToast(msg)
+}
+
 interface ToastItem { id: number; message: string }
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
@@ -22,6 +30,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     setToasts(t => [...t, { id, message }])
     setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3000)
   }, [])
+
+  registerGlobalToast(showToast)
 
   return (
     <ToastContext.Provider value={{ showToast }}>
