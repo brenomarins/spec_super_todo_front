@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react'
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react'
 import { Toast } from './Toast'
 
 interface ToastCtx {
@@ -31,7 +31,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3000)
   }, [])
 
-  registerGlobalToast(showToast)
+  useEffect(() => {
+    registerGlobalToast(showToast)
+  }, [showToast])
 
   return (
     <ToastContext.Provider value={{ showToast }}>
