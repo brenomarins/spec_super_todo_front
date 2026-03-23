@@ -11,6 +11,8 @@ The frontend currently reads and writes all data through a Dexie (IndexedDB) lay
 
 **Approach:** API client module (`src/api/`) with per-resource files. Stores replace repository calls with API calls. IndexedDB and all repository code is deleted.
 
+**Reference:** The full OpenAPI 3.0 contract for the backend is documented in [`docs/superpowers/specs/2026-03-19-backend-api-design.md`](./2026-03-19-backend-api-design.md). This document is the authoritative source for all endpoint paths, request/response shapes, status codes, and edge cases (e.g. 409 on duplicate open session, cascade delete behavior). Implementors should consult it for every `apiFetch` call they write.
+
 ---
 
 ## Design Decisions
