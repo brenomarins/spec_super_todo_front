@@ -10,7 +10,10 @@ import type { Task } from '../../types'
 export function HomeTab() {
   const { tasks } = useTaskStore()
   const { tags } = useTagStore()
-  const { display, isRunning, activeSession, workSessionCount, startSession, stopSession } = usePomodoro()
+  const {
+    display, isRunning, activeSession, workSessionCount,
+    startSession, stopSession, completeSession, startBreakSession,
+  } = usePomodoro()
 
   const today = todayISO()
   const todayTasks = tasks.filter((t: Task) => t.scheduledDay === today && !t.parentId)
@@ -27,9 +30,13 @@ export function HomeTab() {
           taskTitle={timerTask?.title ?? null}
           display={display}
           isRunning={isRunning}
+          sessionType={activeSession?.type ?? null}
           workSessionCount={workSessionCount}
           onStart={startSession}
           onStop={stopSession}
+          onComplete={completeSession}
+          onShortBreak={() => startBreakSession('short_break', timerTaskId ?? undefined)}
+          onLongBreak={() => startBreakSession('long_break', timerTaskId ?? undefined)}
         />
 
         {!isRunning && !timerTaskId && (

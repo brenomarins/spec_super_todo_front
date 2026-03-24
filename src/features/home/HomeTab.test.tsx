@@ -10,16 +10,24 @@ vi.mock('../../store/tagStore')
 vi.mock('../../lib/dateUtils', () => ({ todayISO: () => '2026-03-16' }))
 vi.useFakeTimers()
 
+// Shared mock builder — all tests use this to avoid missing new required fields
+const mockPomodoro = (overrides = {}) => ({
+  activeSession: null,
+  workSessionCount: 0,
+  startSession: vi.fn(),
+  stopSession: vi.fn(),
+  completeSession: vi.fn(),
+  startBreakSession: vi.fn(),
+  ...overrides,
+})
+
 beforeEach(() => {
   vi.setSystemTime(new Date('2026-03-16'))
   vi.mocked(useTagStore).mockReturnValue({ tags: [] } as any)
 })
 
 test('shows no-timer empty state when no active session and no tasks today', () => {
-  vi.mocked(usePomodoroStore).mockReturnValue({
-    activeSession: null, workSessionCount: 0,
-    startSession: vi.fn(), stopSession: vi.fn(),
-  } as any)
+  vi.mocked(usePomodoroStore).mockReturnValue(mockPomodoro() as any)
   vi.mocked(useTaskStore).mockReturnValue({ tasks: [] } as any)
 
   render(<HomeTab />)
@@ -27,10 +35,7 @@ test('shows no-timer empty state when no active session and no tasks today', () 
 })
 
 test('shows todays tasks scheduled for today', () => {
-  vi.mocked(usePomodoroStore).mockReturnValue({
-    activeSession: null, workSessionCount: 0,
-    startSession: vi.fn(), stopSession: vi.fn(),
-  } as any)
+  vi.mocked(usePomodoroStore).mockReturnValue(mockPomodoro() as any)
   vi.mocked(useTaskStore).mockReturnValue({
     tasks: [
       { id: 't1', title: 'Morning standup', completed: false, order: 1, tagIds: [],
@@ -47,10 +52,7 @@ test('shows todays tasks scheduled for today', () => {
 
 test('🍅 button calls startSession with task id', () => {
   const startSession = vi.fn()
-  vi.mocked(usePomodoroStore).mockReturnValue({
-    activeSession: null, workSessionCount: 0,
-    startSession, stopSession: vi.fn(),
-  } as any)
+  vi.mocked(usePomodoroStore).mockReturnValue(mockPomodoro({ startSession }) as any)
   vi.mocked(useTaskStore).mockReturnValue({
     tasks: [
       { id: 't1', title: 'Morning standup', completed: false, order: 1, tagIds: [],
@@ -64,10 +66,7 @@ test('🍅 button calls startSession with task id', () => {
 })
 
 test('shows no-tasks-today empty state when no tasks scheduled for today', () => {
-  vi.mocked(usePomodoroStore).mockReturnValue({
-    activeSession: null, workSessionCount: 0,
-    startSession: vi.fn(), stopSession: vi.fn(),
-  } as any)
+  vi.mocked(usePomodoroStore).mockReturnValue(mockPomodoro() as any)
   vi.mocked(useTaskStore).mockReturnValue({ tasks: [] } as any)
 
   render(<HomeTab />)
@@ -75,10 +74,7 @@ test('shows no-tasks-today empty state when no tasks scheduled for today', () =>
 })
 
 test('renders DueDateBadge for a task with a due date', () => {
-  vi.mocked(usePomodoroStore).mockReturnValue({
-    activeSession: null, workSessionCount: 0,
-    startSession: vi.fn(), stopSession: vi.fn(),
-  } as any)
+  vi.mocked(usePomodoroStore).mockReturnValue(mockPomodoro() as any)
   vi.mocked(useTaskStore).mockReturnValue({
     tasks: [
       { id: 't1', title: 'Morning standup', completed: false, order: 1, tagIds: [],
@@ -87,6 +83,26 @@ test('renders DueDateBadge for a task with a due date', () => {
   } as any)
 
   render(<HomeTab />)
-  // dueDate '2026-03-10' is before today '2026-03-16' → overdue → shows '! Mar 10'
   expect(screen.getByText('! Mar 10')).toBeInTheDocument()
+})
+
+// NEW TEST
+test('shows Complete button when active session is a work session', () => {
+  vi.mocked(usePomodoroStore).mockReturnValue(mockPomodoro({
+    activeSession: {
+      sessionId: 's1', taskId: 't1', type: 'work',
+      startedAt: new Date().toISOString(),
+    },
+  }) as any)
+  vi.mocked(useTaskStore).mockReturnValue({
+    tasks: [
+      { id: 't1', title: 'Coding', completed: false, order: 1, tagIds: [],
+        scheduledDay: '2026-03-16', createdAt: '', updatedAt: '' },
+    ],
+  } as any)
+
+  render(<HomeTab />)
+  expect(screen.getByText(/complete/i)).toBeInTheDocument()
+  expect(screen.getByText(/short break/i)).toBeInTheDocument()
+  expect(screen.getByText(/long break/i)).toBeInTheDocument()
 })
