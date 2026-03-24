@@ -38,23 +38,35 @@ export interface ReorderInput {
   orderedIds: string[]
 }
 
+// Spring Boot serializes absent optional fields as JSON null.
+// The frontend Task type uses undefined for absent optional fields.
+// This normalizer bridges the gap so all consumers can rely on undefined checks.
+function normalizeTask(raw: Task): Task {
+  return {
+    ...raw,
+    parentId:     raw.parentId     ?? undefined,
+    scheduledDay: raw.scheduledDay ?? undefined,
+    dueDate:      raw.dueDate      ?? undefined,
+  }
+}
+
 export const listTasks = () =>
-  apiFetch<Task[]>('/tasks')
+  apiFetch<Task[]>('/tasks').then(tasks => tasks.map(normalizeTask))
 
 export const getTask = (id: string) =>
-  apiFetch<Task>(`/tasks/${id}`)
+  apiFetch<Task>(`/tasks/${id}`).then(normalizeTask)
 
 export const createTask = (input: CreateTaskInput) =>
   apiFetch<Task>('/tasks', {
     method: 'POST',
     body: JSON.stringify(input),
-  })
+  }).then(normalizeTask)
 
 export const updateTask = (id: string, input: UpdateTaskInput) =>
   apiFetch<Task>(`/tasks/${id}`, {
     method: 'PATCH',
     body: JSON.stringify(input),
-  })
+  }).then(normalizeTask)
 
 export const deleteTask = (id: string) =>
   apiFetch<void>(`/tasks/${id}`, { method: 'DELETE' })
