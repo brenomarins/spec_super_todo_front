@@ -18,6 +18,7 @@ interface PomodoroStore {
   startSession: (taskId: string) => Promise<void>
   stopSession: () => Promise<void>
   completeSession: () => Promise<void>
+  startBreakSession: (type: 'short_break' | 'long_break', taskId?: string) => Promise<void>
 }
 
 export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
@@ -68,5 +69,24 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
     } else {
       set({ activeSession: null })
     }
+  },
+
+  startBreakSession: async (type: 'short_break' | 'long_break', taskId?: string) => {
+    const { activeSession, workSessionCount } = get()
+    if (activeSession) {
+      await api.completeSession(activeSession.sessionId)
+      if (activeSession.type === 'work') {
+        set({ workSessionCount: workSessionCount + 1 })
+      }
+    }
+    const session = await api.startBreakSession(type, taskId)
+    set({
+      activeSession: {
+        sessionId: session.id,
+        taskId: session.taskId,
+        type: session.type,
+        startedAt: session.startedAt,
+      },
+    })
   },
 }))
