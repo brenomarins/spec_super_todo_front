@@ -1,25 +1,29 @@
+// src/components/RecoveryScreen.tsx
 import { downloadJSON, buildExportPayload } from '../lib/exportUtils'
-import { db } from '../db/db'
+import * as apiTasks from '../api/tasks'
+import * as apiTags from '../api/tags'
+import * as apiNotes from '../api/notes'
+import * as apiSessions from '../api/sessions'
 
 export function RecoveryScreen() {
   async function handleExport() {
-    // Note: If db.open() failed due to corruption, these queries may also fail.
-    // The catch block handles this by showing an alert — best-effort export only.
     try {
       const [tasks, tags, notes, sessions] = await Promise.all([
-        db.tasks.toArray(), db.tags.toArray(),
-        db.notes.toArray(), db.pomodoroSessions.toArray(),
+        apiTasks.listTasks(),
+        apiTags.listTags(),
+        apiNotes.listNotes(),
+        apiSessions.listSessions(),
       ])
       downloadJSON(buildExportPayload(tasks, tags, notes, sessions))
     } catch {
-      alert('Could not read data for export.')
+      alert('Could not fetch data for export.')
     }
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', gap: 16 }}>
-      <h2>Storage Error</h2>
-      <p>The local database could not be opened. Your data may be corrupted or storage is full.</p>
+      <h2>Connection Error</h2>
+      <p>Could not connect to the backend. Make sure the server is running.</p>
       <button onClick={handleExport}>Export Backup (JSON)</button>
     </div>
   )

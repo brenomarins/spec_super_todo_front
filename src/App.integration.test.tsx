@@ -1,8 +1,22 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import App from './App'
-import { db } from './db/db'
+import * as apiTasks from './api/tasks'
+import * as apiTags from './api/tags'
+import * as apiNotes from './api/notes'
+import * as apiSessions from './api/sessions'
 
-// Uses fake-indexeddb
+vi.mock('./api/tasks')
+vi.mock('./api/tags')
+vi.mock('./api/notes')
+vi.mock('./api/sessions')
+
+beforeEach(() => {
+  vi.mocked(apiTasks.listTasks).mockResolvedValue([])
+  vi.mocked(apiTags.listTags).mockResolvedValue([])
+  vi.mocked(apiNotes.listNotes).mockResolvedValue([])
+  vi.mocked(apiSessions.getOpenSession).mockResolvedValue(null)
+})
+
 test('renders all 4 tabs', async () => {
   render(<App />)
   await waitFor(() => {
@@ -22,11 +36,11 @@ test('switches to Tasks tab on click', async () => {
   })
 })
 
-test('shows RecoveryScreen when DB fails to open', async () => {
-  vi.spyOn(db, 'open').mockRejectedValueOnce(new Error('QuotaExceededError'))
+test('shows RecoveryScreen when API fails', async () => {
+  vi.mocked(apiTasks.listTasks).mockRejectedValueOnce(new Error('Network Error'))
   render(<App />)
   await waitFor(() => {
-    expect(screen.getByText(/storage error/i)).toBeInTheDocument()
+    expect(screen.getByText(/connection error/i)).toBeInTheDocument()
   })
 })
 

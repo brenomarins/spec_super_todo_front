@@ -1,3 +1,4 @@
+// src/App.tsx
 import { useState, useEffect } from 'react'
 import { TabBar, type Tab } from './components/TabBar'
 import { ToastProvider } from './components/ToastProvider'
@@ -10,35 +11,43 @@ import { StatsTab } from './features/stats/StatsTab'
 import { useTaskStore } from './store/taskStore'
 import { useTagStore } from './store/tagStore'
 import { useNoteStore } from './store/noteStore'
-import { usePomodoroStore, recoverStaleSession } from './store/pomodoroStore'
-import { TaskRepository } from './db/repositories/TaskRepository'
-import { TagRepository } from './db/repositories/TagRepository'
-import { NoteRepository } from './db/repositories/NoteRepository'
-import { PomodoroRepository } from './db/repositories/PomodoroRepository'
-import { db } from './db/db'
+import { usePomodoroStore } from './store/pomodoroStore'
+import * as apiTasks from './api/tasks'
+import * as apiTags from './api/tags'
+import * as apiNotes from './api/notes'
+import * as apiSessions from './api/sessions'
+
+const TWO_HOURS_MS = 2 * 60 * 60 * 1000
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('home')
-  const [dbError, setDbError] = useState(false)
+  const [apiError, setApiError] = useState(false)
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     async function init() {
       try {
-        await db.open()
         const [tasks, tags, notes] = await Promise.all([
-          new TaskRepository(db).getAll(),
-          new TagRepository(db).getAll(),
-          new NoteRepository(db).getAll(),
+          apiTasks.listTasks(),
+          apiTags.listTags(),
+          apiNotes.listNotes(),
         ])
         useTaskStore.getState().setTasks(tasks)
         useTagStore.getState().setTags(tags)
         useNoteStore.getState().setNotes(notes)
 
-        const recovery = await recoverStaleSession()
-        if (recovery === 'active') {
-          const openSession = await new PomodoroRepository(db).getOpenSession()
-          if (openSession) {
+        const openSession = await apiSessions.getOpenSession()
+        if (openSession) {
+          const age = Date.now() - Date.parse(openSession.startedAt)
+          if (age > TWO_HOURS_MS) {
+            // stale session — close it without restoring
+            // interrupt is work-only per API spec; use complete for break sessions
+            if (openSession.type === 'work') {
+              await apiSessions.interruptSession(openSession.id)
+            } else {
+              await apiSessions.completeSession(openSession.id)
+            }
+          } else {
             usePomodoroStore.getState().setActiveSession({
               sessionId: openSession.id,
               taskId: openSession.taskId,
@@ -50,14 +59,14 @@ export default function App() {
 
         setLoaded(true)
       } catch (e) {
-        console.error('DB init failed', e)
-        setDbError(true)
+        console.error('API init failed', e)
+        setApiError(true)
       }
     }
     init()
   }, [])
 
-  if (dbError) {
+  if (apiError) {
     return (
       <ToastProvider>
         <RecoveryScreen />
