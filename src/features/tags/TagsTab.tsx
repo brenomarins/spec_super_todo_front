@@ -8,7 +8,7 @@ export function TagsTab() {
   const [editing, setEditing] = useState<Tag | null>(null)
 
   return (
-    <div style={{ padding: 24, maxWidth: 600, margin: '0 auto' }}>
+    <div style={{ padding: 24, maxWidth: 600, margin: '0 auto', height: '100%', overflowY: 'auto', boxSizing: 'border-box' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between',
         alignItems: 'center', marginBottom: 16 }}>
         <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>Tags</h2>

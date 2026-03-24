@@ -100,3 +100,18 @@ test('API error on Save shows toast and keeps modal open', async () => {
     expect(onClose).not.toHaveBeenCalled()
   })
 })
+
+test('API error on Delete shows toast and keeps modal open', async () => {
+  vi.mocked(useTagStore).mockReturnValue({
+    updateTag: vi.fn(),
+    deleteTag: vi.fn().mockRejectedValue(new Error('Network error')),
+  } as any)
+  const onClose = vi.fn()
+  renderModal(onClose)
+  fireEvent.click(screen.getByRole('button', { name: /^delete$/i }))
+  fireEvent.click(screen.getByRole('button', { name: /confirm delete/i }))
+  await waitFor(() => {
+    expect(screen.getByText(/failed to delete/i)).toBeInTheDocument()
+    expect(onClose).not.toHaveBeenCalled()
+  })
+})
