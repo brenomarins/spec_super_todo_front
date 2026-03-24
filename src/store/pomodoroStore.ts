@@ -75,9 +75,6 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
     const { activeSession, workSessionCount } = get()
     if (activeSession) {
       await api.completeSession(activeSession.sessionId)
-      if (activeSession.type === 'work') {
-        set({ workSessionCount: workSessionCount + 1 })
-      }
     }
     const session = await api.startBreakSession(type, taskId)
     set({
@@ -87,6 +84,7 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
         type: session.type,
         startedAt: session.startedAt,
       },
+      workSessionCount: activeSession?.type === 'work' ? workSessionCount + 1 : workSessionCount,
     })
   },
 }))
