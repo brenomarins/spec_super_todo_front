@@ -1,5 +1,5 @@
 // src/api/sessions.ts
-import { apiFetch } from './client'
+import { apiFetch, ApiError } from './client'
 import type { PomodoroSession } from '../types'
 
 export const listSessions = (taskId?: string) => {
@@ -8,7 +8,12 @@ export const listSessions = (taskId?: string) => {
 }
 
 export const getOpenSession = () =>
-  apiFetch<PomodoroSession | null>('/sessions/open').then(v => v ?? null)
+  apiFetch<PomodoroSession | null>('/sessions/open')
+    .then(v => v ?? null)
+    .catch((err: unknown) => {
+      if (err instanceof ApiError && err.status === 404) return null
+      throw err
+    })
 
 export const startWorkSession = (taskId: string) =>
   apiFetch<PomodoroSession>('/sessions/work', {
