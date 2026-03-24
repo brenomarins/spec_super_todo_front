@@ -34,8 +34,8 @@ export const useTaskStore = create<TaskStore>(set => ({
   },
   updateTask: async (partial) => {
     const { id, createdAt: _ca, updatedAt: _ua, ...changes } = partial
-    await api.updateTask(id, changes)
-    set(s => ({ tasks: s.tasks.map(t => t.id === id ? { ...t, ...changes } : t) }))
+    const saved = await api.updateTask(id, changes)
+    set(s => ({ tasks: s.tasks.map(t => t.id === id ? saved : t) }))
   },
   reorderTasks: async (ids, parentId) => {
     await api.reorderTasks({ orderedIds: ids, parentId })

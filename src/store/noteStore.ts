@@ -37,7 +37,7 @@ export const useNoteStore = create<NoteStore>(set => ({
   },
   updateNote: async (partial) => {
     const { id, createdAt: _ca, updatedAt: _ua, ...changes } = partial
-    await api.updateNote(id, changes)
-    set(s => ({ notes: s.notes.map(n => n.id === id ? { ...n, ...changes } : n) }))
+    const saved = await api.updateNote(id, changes)
+    set(s => ({ notes: s.notes.map(n => n.id === id ? saved : n) }))
   },
 }))

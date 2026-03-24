@@ -8,7 +8,7 @@ export const listSessions = (taskId?: string) => {
 }
 
 export const getOpenSession = () =>
-  apiFetch<PomodoroSession | null>('/sessions/open')
+  apiFetch<PomodoroSession | null>('/sessions/open').then(v => v ?? null)
 
 export const startWorkSession = (taskId: string) =>
   apiFetch<PomodoroSession>('/sessions/work', {

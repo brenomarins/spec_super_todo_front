@@ -1,5 +1,4 @@
 import '@testing-library/jest-dom'
-import 'fake-indexeddb/auto'
 
 // jsdom 29 does not synthesize CSS shorthand values (like `border`) in getComputedStyle.
 // This custom matcher extends toHaveStyle to fall back to checking the inline style

@@ -28,8 +28,12 @@ export function useStatsData(filter: TimeFilter): StatsData {
     let cancelled = false
 
     async function load() {
-      const result = await getStats(filter)
-      if (!cancelled) setData(result)
+      try {
+        const result = await getStats(filter)
+        if (!cancelled) setData(result)
+      } catch {
+        // toast already shown by apiFetch; leave data as EMPTY
+      }
     }
 
     load()
