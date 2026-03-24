@@ -5,12 +5,27 @@ interface PomodoroTimerProps {
   taskTitle: string | null
   display: string
   isRunning: boolean
+  sessionType: 'work' | 'short_break' | 'long_break' | null
   workSessionCount: number
   onStart: (taskId: string) => void
   onStop: () => void
+  onComplete: () => void
+  onShortBreak: () => void
+  onLongBreak: () => void
 }
 
-export function PomodoroTimer({ taskId, taskTitle, display, isRunning, workSessionCount, onStart, onStop }: PomodoroTimerProps) {
+const btnBase = {
+  border: '1px solid var(--color-border)',
+  padding: '6px 12px',
+  borderRadius: 6,
+  cursor: 'pointer' as const,
+  fontSize: 13,
+}
+
+export function PomodoroTimer({
+  taskId, taskTitle, display, isRunning, sessionType, workSessionCount,
+  onStart, onStop, onComplete, onShortBreak, onLongBreak,
+}: PomodoroTimerProps) {
   return (
     <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)',
       borderRadius: 12, padding: 20, textAlign: 'center', maxWidth: 320, margin: '0 auto' }}>
@@ -27,15 +42,29 @@ export function PomodoroTimer({ taskId, taskTitle, display, isRunning, workSessi
         {display}
       </div>
 
-      <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 12 }}>
-        {isRunning ? (
-          <button
-            type="button"
-            onClick={onStop}
-            style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)',
-              color: 'var(--color-text)', padding: '6px 16px', borderRadius: 6,
-              cursor: 'pointer', fontSize: 13 }}
-          >
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
+        {sessionType === 'work' ? (
+          <>
+            <button type="button" onClick={onComplete}
+              style={{ ...btnBase, background: 'var(--color-success)', color: '#fff', border: 'none' }}>
+              ✅ Complete
+            </button>
+            <button type="button" onClick={onShortBreak}
+              style={{ ...btnBase, background: 'var(--color-surface-2)', color: 'var(--color-text)' }}>
+              ☕ Short Break
+            </button>
+            <button type="button" onClick={onLongBreak}
+              style={{ ...btnBase, background: 'var(--color-surface-2)', color: 'var(--color-text)' }}>
+              🌙 Long Break
+            </button>
+            <button type="button" onClick={onStop}
+              style={{ ...btnBase, background: 'var(--color-surface-2)', color: 'var(--color-text)' }}>
+              ⏹ Stop
+            </button>
+          </>
+        ) : isRunning ? (
+          <button type="button" onClick={onStop}
+            style={{ ...btnBase, background: 'var(--color-surface-2)', color: 'var(--color-text)' }}>
             ⏹ Stop
           </button>
         ) : (
