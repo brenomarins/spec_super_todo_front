@@ -19,7 +19,7 @@ The new "Tags" tab content. Reads all tags from `tagStore` and renders a list. E
 - A color swatch (the tag's current color)
 - The tag name
 - An **Edit** button — opens `TagEditModal` for that tag
-- A **Delete** button — opens `TagEditModal` in delete-confirm mode (or triggers inline confirm)
+- A **Delete** button — opens `TagEditModal`, which contains the inline delete-confirm flow
 
 ### New: `src/features/tags/TagEditModal.tsx`
 
@@ -42,10 +42,18 @@ Add a hex text input below the preset swatches. Behavior:
 
 ### Changed: `src/store/tagStore.ts`
 
-Add `updateTag(id: string, patch: { name?: string; color?: string }): Promise<Tag>` action:
+Add two new actions:
+
+**`updateTag(id: string, patch: { name?: string; color?: string }): Promise<Tag>`**
 1. Calls `api.updateTag(id, patch)`
 2. On success, calls `upsertTag(result)` to update the store
 3. Returns the updated tag
+
+**`deleteTag(id: string): Promise<void>`**
+1. Calls `api.deleteTag(id)`
+2. On success, calls `removeTag(id)` (existing action) to remove from store
+
+Both `TagEditModal` operations go through the store, keeping API calls out of components.
 
 ### Changed: `src/components/TabBar.tsx`
 
@@ -55,7 +63,7 @@ Add `updateTag(id: string, patch: { name?: string; color?: string }): Promise<Ta
 ### Changed: `src/App.tsx`
 
 - Handle `active === 'tags'` to render `<TagsTab />`
-- Pass required props (tags from store, store actions)
+- `TagsTab` reads from `useTagStore` directly (same pattern as all other tabs)
 
 ---
 
@@ -63,7 +71,7 @@ Add `updateTag(id: string, patch: { name?: string; color?: string }): Promise<Ta
 
 1. Tags are already fetched into `tagStore` on app load — `TagsTab` reads them reactively, no new fetch needed.
 2. **Edit save:** `TagEditModal` → `tagStore.updateTag(id, patch)` → `api.updateTag` → `upsertTag(response)` → all `TagBadge` instances across the app update reactively.
-3. **Delete:** confirm in modal → `api.deleteTag(id)` → `tagStore.removeTag(id)` (existing action) → modal closes.
+3. **Delete:** confirm in modal → `tagStore.deleteTag(id)` → `api.deleteTag` → `removeTag(id)` → modal closes.
 4. **Hex input:** valid 6-digit hex (with or without `#`) updates the selected color live; preset swatches stay in sync.
 
 ---
