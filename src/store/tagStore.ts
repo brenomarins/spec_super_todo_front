@@ -1,7 +1,7 @@
+// src/store/tagStore.ts
 import { create } from 'zustand'
 import type { Tag } from '../types'
-import { TagRepository } from '../db/repositories/TagRepository'
-import { db } from '../db/db'
+import * as api from '../api/tags'
 
 interface TagStore {
   tags: Tag[]
@@ -22,9 +22,7 @@ export const useTagStore = create<TagStore>(set => ({
     })),
   removeTag: id => set(s => ({ tags: s.tags.filter(t => t.id !== id) })),
   addTag: async (tag) => {
-    const repo = new TagRepository(db)
-    const { id: _id, ...input } = tag
-    const saved = await repo.create(input)
+    const saved = await api.createTag({ id: tag.id, name: tag.name, color: tag.color })
     set(s => ({ tags: [...s.tags, saved] }))
     return saved
   },

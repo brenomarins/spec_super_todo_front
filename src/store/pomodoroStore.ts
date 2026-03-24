@@ -1,21 +1,6 @@
+// src/store/pomodoroStore.ts
 import { create } from 'zustand'
-import { PomodoroRepository } from '../db/repositories/PomodoroRepository'
-import { db } from '../db/db'
-
-const TWO_HOURS_MS = 2 * 60 * 60 * 1000
-
-export async function recoverStaleSession(): Promise<'active' | 'interrupted' | null> {
-  localStorage.removeItem('pomodoro:activeSession')
-  const repo = new PomodoroRepository(db)
-  const openSession = await repo.getOpenSession()
-  if (!openSession) return null
-  const age = Date.now() - Date.parse(openSession.startedAt)
-  if (age < TWO_HOURS_MS) return 'active'
-  if (openSession.type === 'work' && openSession.taskId) {
-    await repo.upsertStatsInterrupted(openSession.taskId)
-  }
-  return 'interrupted'
-}
+import * as api from '../api/sessions'
 
 interface ActiveSession {
   taskId?: string
@@ -44,16 +29,15 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
 
   startSession: async (taskId: string) => {
     const { activeSession } = get()
-    const repo = new PomodoroRepository(db)
     if (activeSession) {
       if (activeSession.type === 'work') {
-        await repo.interruptWorkSession(activeSession.sessionId)
+        await api.interruptSession(activeSession.sessionId)
       } else {
-        // end break session without stats
-        await repo.completeBreakSession(activeSession.sessionId)
+        // break sessions use complete — interrupt is work-only per API spec
+        await api.completeSession(activeSession.sessionId)
       }
     }
-    const session = await repo.createWorkSession(taskId)
+    const session = await api.startWorkSession(taskId)
     set({
       activeSession: {
         sessionId: session.id,
@@ -67,11 +51,10 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
   stopSession: async () => {
     const { activeSession } = get()
     if (!activeSession) return
-    const repo = new PomodoroRepository(db)
     if (activeSession.type === 'work') {
-      await repo.interruptWorkSession(activeSession.sessionId)
+      await api.interruptSession(activeSession.sessionId)
     } else {
-      await repo.completeBreakSession(activeSession.sessionId)
+      await api.completeSession(activeSession.sessionId)
     }
     set({ activeSession: null })
   },
@@ -79,12 +62,10 @@ export const usePomodoroStore = create<PomodoroStore>((set, get) => ({
   completeSession: async () => {
     const { activeSession, workSessionCount } = get()
     if (!activeSession) return
-    const repo = new PomodoroRepository(db)
+    await api.completeSession(activeSession.sessionId)
     if (activeSession.type === 'work') {
-      await repo.completeWorkSession(activeSession.sessionId, new Date().toISOString())
       set({ activeSession: null, workSessionCount: workSessionCount + 1 })
     } else {
-      await repo.completeBreakSession(activeSession.sessionId)
       set({ activeSession: null })
     }
   },
