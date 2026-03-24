@@ -17,7 +17,7 @@ Configure a Vite dev proxy so the browser always makes same-origin requests to `
 
 ### `vite.config.ts`
 
-Add a `server.proxy` block:
+Add a `server.proxy` block. The file currently imports `defineConfig` from `vitest/config`, which re-exports Vite's full `defineConfig` — `server.proxy` is supported without changing the import.
 
 ```ts
 server: {
@@ -41,6 +41,8 @@ VITE_API_URL=/api/v1
 ```
 
 `src/api/client.ts` already reads `import.meta.env.VITE_API_URL` with a fallback to `http://localhost:8091/api/v1`. Setting it to `/api/v1` makes every `apiFetch` call use a relative URL, routing through the Vite proxy.
+
+This file contains no secrets and is the same for all developers — commit it. (`.env.local`, which is gitignored via `*.local`, is the right place for per-developer overrides.)
 
 ## What Does Not Change
 
