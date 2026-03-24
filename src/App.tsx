@@ -8,6 +8,7 @@ import { TasksTab } from './features/tasks/TasksTab'
 import { ScheduleTab } from './features/schedule/ScheduleTab'
 import { NotesTab } from './features/notes/NotesTab'
 import { StatsTab } from './features/stats/StatsTab'
+import { TagsTab } from './features/tags/TagsTab'
 import { useTaskStore } from './store/taskStore'
 import { useTagStore } from './store/tagStore'
 import { useNoteStore } from './store/noteStore'
@@ -92,6 +93,7 @@ export default function App() {
           {tab === 'schedule' && <ScheduleTab />}
           {tab === 'notes' && <NotesTab />}
           {tab === 'stats' && <StatsTab />}
+          {tab === 'tags' && <TagsTab />}
         </main>
       </div>
     </ToastProvider>
