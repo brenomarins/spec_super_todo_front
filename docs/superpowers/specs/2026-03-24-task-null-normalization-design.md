@@ -59,5 +59,6 @@ New test file `src/api/__tests__/tasks.test.ts`:
 - `normalizeTask` preserves string values in all three fields
 - `normalizeTask` preserves all other Task fields unchanged
 - `listTasks` returns normalized tasks (stub `apiFetch`)
+- `getTask` returns normalized task
 - `createTask` returns normalized task
 - `updateTask` returns normalized task
