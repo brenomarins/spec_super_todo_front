@@ -48,7 +48,10 @@
       "Bash(xargs grep:*)",
       "Bash(find E:/codigos/spec_super_todo_front/node_modules/jsdom/lib/generated -name css-property-descriptors*)",
       "Bash(npm list:*)",
-      "Bash(find /e/codigos/spec_super_todo_front/src -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))"
+      "Bash(find /e/codigos/spec_super_todo_front/src -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
+      "Bash(bash \"C:\\\\Users\\\\breno\\\\.claude\\\\plugins\\\\cache\\\\claude-plugins-official\\\\superpowers\\\\5.0.2\\\\scripts\\\\start-server.sh\" --project-dir \"E:\\\\codigos\\\\spec_super_todo_front\")",
+      "Bash(bash \"C:\\\\Users\\\\breno\\\\.claude\\\\plugins\\\\cache\\\\claude-plugins-official\\\\superpowers\\\\5.0.2\\\\skills\\\\brainstorming\\\\scripts\\\\start-server.sh\" --project-dir \"E:\\\\codigos\\\\spec_super_todo_front\")",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\({k:d[k] for k in [''''scripts'''',''''dependencies'''',''''devDependencies''''] if k in d}, indent=2\\)\\)\")"
     ]
   }
 }

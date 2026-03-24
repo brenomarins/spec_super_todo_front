@@ -1,0 +1,163 @@
+<h2>By Day — Display Format</h2>
+<p class="subtitle">What should the "By Day" tab show?</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Bar chart by day</h3>
+      <p>A simple bar chart — one bar per day showing hours of focused work. Changes with the time filter (e.g. last 7 days, this week). Easy to see which days you worked most.</p>
+      <div style="margin-top: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+        <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; margin-bottom: 10px;">Focus hours — last 7 days</div>
+        <div style="display: flex; align-items: flex-end; gap: 8px; height: 70px; padding: 0 4px;">
+          <div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:4px;">
+            <span style="color:var(--muted); font-size:10px;">1h</span>
+            <div style="background: var(--accent); opacity:0.4; width:100%; height:18px; border-radius:3px 3px 0 0;"></div>
+            <span style="color:var(--muted); font-size:9px;">Mon</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:4px;">
+            <span style="color:var(--muted); font-size:10px;">3h</span>
+            <div style="background: var(--accent); opacity:0.6; width:100%; height:44px; border-radius:3px 3px 0 0;"></div>
+            <span style="color:var(--muted); font-size:9px;">Tue</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:4px;">
+            <span style="color:var(--muted); font-size:10px;">2h</span>
+            <div style="background: var(--accent); opacity:0.5; width:100%; height:30px; border-radius:3px 3px 0 0;"></div>
+            <span style="color:var(--muted); font-size:9px;">Wed</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:4px;">
+            <span style="color:var(--muted); font-size:10px;">4h</span>
+            <div style="background: var(--accent); width:100%; height:58px; border-radius:3px 3px 0 0;"></div>
+            <span style="color:var(--muted); font-size:9px;">Thu</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:4px;">
+            <span style="color:var(--muted); font-size:10px;">3h</span>
+            <div style="background: var(--accent); opacity:0.7; width:100%; height:44px; border-radius:3px 3px 0 0;"></div>
+            <span style="color:var(--muted); font-size:9px;">Fri</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:4px;">
+            <span style="color:var(--muted); font-size:10px;">0.5h</span>
+            <div style="background: var(--accent); opacity:0.2; width:100%; height:8px; border-radius:3px 3px 0 0;"></div>
+            <span style="color:var(--muted); font-size:9px;">Sat</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; flex:1; gap:4px;">
+            <span style="color:var(--muted); font-size:10px;">0h</span>
+            <div style="background: var(--accent); opacity:0.1; width:100%; height:2px; border-radius:3px 3px 0 0;"></div>
+            <span style="color:var(--muted); font-size:9px;">Sun</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Calendar heatmap</h3>
+      <p>Like GitHub's contribution graph — a grid of all days in the year, colored by intensity (more hours = darker). Great for spotting patterns and streaks over months at a glance.</p>
+      <div style="margin-top: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
+        <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; margin-bottom: 8px;">Activity — last 3 months</div>
+        <div style="display: flex; gap: 3px; flex-wrap: wrap;">
+          <!-- simulate ~13 weeks of day squares -->
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <span style="color:var(--muted); font-size:8px; height:11px;">M</span>
+            <span style="color:var(--muted); font-size:8px; height:11px;">W</span>
+            <span style="color:var(--muted); font-size:8px; height:11px;">F</span>
+          </div>
+          <!-- Week columns -->
+          <script>
+            const intensities = [0,0.1,0.3,0,0.6,0.9,1,0.2,0,0.5,0.7,0.4,0,0.3,0.8,0.2,0,0.9,1,0.6,0,0.1,0.4,0,0.7,0.9,0.5,0,0.2,0.8,1,0,0.3,0.6,0.4,0,0.5,0.9,0.7,0,0.2,0.4];
+            let html = '';
+            for(let w = 0; w < 13; w++) {
+              html += '<div style="display:flex;flex-direction:column;gap:3px;">';
+              for(let d = 0; d < 7; d++) {
+                const v = intensities[(w*7+d) % intensities.length];
+                const alpha = v < 0.05 ? 0.07 : v;
+                html += `<div style="width:11px;height:11px;border-radius:2px;background:var(--accent);opacity:${alpha};"></div>`;
+              }
+              html += '</div>';
+            }
+            document.write(html);
+          </script>
+        </div>
+        <div style="display: flex; align-items: center; gap: 4px; margin-top: 8px;">
+          <span style="color:var(--muted); font-size:9px;">Less</span>
+          <div style="width:10px;height:10px;border-radius:2px;background:var(--accent);opacity:0.1;"></div>
+          <div style="width:10px;height:10px;border-radius:2px;background:var(--accent);opacity:0.35;"></div>
+          <div style="width:10px;height:10px;border-radius:2px;background:var(--accent);opacity:0.6;"></div>
+          <div style="width:10px;height:10px;border-radius:2px;background:var(--accent);opacity:0.85;"></div>
+          <div style="width:10px;height:10px;border-radius:2px;background:var(--accent);opacity:1;"></div>
+          <span style="color:var(--muted); font-size:9px;">More</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Both — heatmap + bar chart</h3>
+      <p>Heatmap at the top for the big picture (months of history at a glance). Click a day or week on the heatmap to zoom in — the bar chart below updates to show that specific period.</p>
+      <div style="margin-top: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 11px;">
+        <div style="color: var(--muted); font-size: 10px; text-transform: uppercase; margin-bottom: 6px;">Activity heatmap</div>
+        <div style="display:flex; gap:2px; flex-wrap:wrap; margin-bottom: 10px;">
+          <div style="display: flex; flex-direction: column; gap: 2px; margin-right: 2px;">
+            <span style="color:var(--muted); font-size:8px; height:9px;">M</span>
+            <span style="color:var(--muted); font-size:8px; height:9px;">W</span>
+            <span style="color:var(--muted); font-size:8px; height:9px;">F</span>
+          </div>
+          <script>
+            const vals = [0,0.2,0.5,0,0.7,1,0.9,0.1,0,0.4,0.8,0.3,0,0.6,1,0.4,0,0.9,1,0.7,0,0.2,0.5,0,0.6,0.9,0.8,0,0.3,0.7,1,0,0.4,0.6,0.3];
+            let h2 = '';
+            for(let w=0;w<13;w++){
+              h2+='<div style="display:flex;flex-direction:column;gap:2px;">';
+              for(let d=0;d<7;d++){
+                const v=vals[(w*7+d)%vals.length];
+                const a=v<0.05?0.07:v;
+                const sel = (w===10) ? 'border:1.5px solid var(--accent);' : '';
+                h2+=`<div style="width:9px;height:9px;border-radius:2px;background:var(--accent);opacity:${a};${sel}"></div>`;
+              }
+              h2+='</div>';
+            }
+            document.write(h2);
+          </script>
+        </div>
+        <div style="color: var(--muted); font-size: 10px; text-transform: uppercase; margin-bottom: 4px;">Selected week detail</div>
+        <div style="display: flex; align-items: flex-end; gap: 5px; height: 40px;">
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+            <div style="background:var(--accent);opacity:0.4;width:100%;height:12px;border-radius:2px 2px 0 0;"></div>
+            <span style="color:var(--muted);font-size:8px;">M</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+            <div style="background:var(--accent);width:100%;height:34px;border-radius:2px 2px 0 0;"></div>
+            <span style="color:var(--muted);font-size:8px;">T</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+            <div style="background:var(--accent);opacity:0.7;width:100%;height:26px;border-radius:2px 2px 0 0;"></div>
+            <span style="color:var(--muted);font-size:8px;">W</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+            <div style="background:var(--accent);opacity:0.9;width:100%;height:32px;border-radius:2px 2px 0 0;"></div>
+            <span style="color:var(--muted);font-size:8px;">T</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+            <div style="background:var(--accent);opacity:0.5;width:100%;height:18px;border-radius:2px 2px 0 0;"></div>
+            <span style="color:var(--muted);font-size:8px;">F</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+            <div style="background:var(--accent);opacity:0.1;width:100%;height:4px;border-radius:2px 2px 0 0;"></div>
+            <span style="color:var(--muted);font-size:8px;">S</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px;">
+            <div style="background:var(--accent);opacity:0.05;width:100%;height:2px;border-radius:2px 2px 0 0;"></div>
+            <span style="color:var(--muted);font-size:8px;">S</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top: 16px;">A = bar chart only &nbsp;·&nbsp; B = heatmap only &nbsp;·&nbsp; C = heatmap + bar chart (click to drill down)</p>

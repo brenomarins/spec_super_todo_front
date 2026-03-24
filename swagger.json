@@ -1,0 +1,1690 @@
+{
+	"openapi": "3.1.0",
+	"info": {
+		"title": "Super Todo API",
+		"description": "Time Manager REST API — tasks, notes, tags, sessions, and stats",
+		"version": "1.0.0"
+	},
+	"servers": [
+		{
+			"url": "http://localhost:8091",
+			"description": "Generated server url"
+		}
+	],
+	"paths": {
+		"/api/v1/tasks": {
+			"get": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "List all tasks",
+				"operationId": "listTasks",
+				"responses": {
+					"200": {
+						"description": "List of tasks",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/TaskResponse"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Create a task",
+				"operationId": "createTask",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateTaskRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"400": {
+						"description": "Validation error",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Task created",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/TaskResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/tasks/reorder": {
+			"post": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Reorder tasks",
+				"operationId": "reorderTasks",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ReorderRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"422": {
+						"description": "Invalid reorder request",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "Tasks reordered"
+					}
+				}
+			}
+		},
+		"/api/v1/tags": {
+			"get": {
+				"tags": [
+					"Tags"
+				],
+				"summary": "List all tags",
+				"operationId": "listTags",
+				"responses": {
+					"200": {
+						"description": "List of tags",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/TagResponse"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"Tags"
+				],
+				"summary": "Create a tag",
+				"operationId": "createTag",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateTagRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Tag created",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/TagResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Validation error",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/sessions/{id}/interrupt": {
+			"post": {
+				"tags": [
+					"Sessions"
+				],
+				"summary": "Interrupt a work session",
+				"operationId": "interruptSession",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Session ID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"422": {
+						"description": "Break sessions cannot be interrupted",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Session not found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "Session interrupted"
+					}
+				}
+			}
+		},
+		"/api/v1/sessions/{id}/complete": {
+			"post": {
+				"tags": [
+					"Sessions"
+				],
+				"summary": "Complete a session",
+				"operationId": "completeSession",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Session ID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Session completed"
+					},
+					"404": {
+						"description": "Session not found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/sessions/work": {
+			"post": {
+				"tags": [
+					"Sessions"
+				],
+				"summary": "Start a 25-minute work session",
+				"operationId": "startWorkSession",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/StartWorkSessionRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"400": {
+						"description": "Validation error",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Task not found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"409": {
+						"description": "A session is already open",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Work session started",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/SessionResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/sessions/break": {
+			"post": {
+				"tags": [
+					"Sessions"
+				],
+				"summary": "Start a break session",
+				"operationId": "startBreakSession",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/StartBreakSessionRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"400": {
+						"description": "Validation error",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Break session started",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/SessionResponse"
+								}
+							}
+						}
+					},
+					"409": {
+						"description": "A session is already open",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/notes": {
+			"get": {
+				"tags": [
+					"Notes"
+				],
+				"summary": "List all notes",
+				"operationId": "listNotes",
+				"responses": {
+					"200": {
+						"description": "List of notes",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/NoteResponse"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"Notes"
+				],
+				"summary": "Create a note",
+				"operationId": "createNote",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateNoteRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"400": {
+						"description": "Validation error",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"201": {
+						"description": "Note created",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/NoteResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/tasks/{id}": {
+			"get": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Get a task",
+				"operationId": "getTask",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Task ID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"404": {
+						"description": "Task not found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "Task found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/TaskResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Delete a task",
+				"operationId": "deleteTask",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Task ID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"404": {
+						"description": "Task not found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "Task deleted"
+					}
+				}
+			},
+			"patch": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Update a task",
+				"operationId": "updateTask",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Task ID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateTaskRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Task updated",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/TaskResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Task not found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/tags/{id}": {
+			"delete": {
+				"tags": [
+					"Tags"
+				],
+				"summary": "Delete a tag",
+				"operationId": "deleteTag",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Tag ID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "Tag deleted"
+					},
+					"404": {
+						"description": "Tag not found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"patch": {
+				"tags": [
+					"Tags"
+				],
+				"summary": "Update a tag",
+				"operationId": "updateTag",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Tag ID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateTagRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "Tag updated",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/TagResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Tag not found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/notes/{id}": {
+			"get": {
+				"tags": [
+					"Notes"
+				],
+				"summary": "Get a note",
+				"operationId": "getNote",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Note ID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"404": {
+						"description": "Note not found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "Note found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/NoteResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"tags": [
+					"Notes"
+				],
+				"summary": "Delete a note",
+				"operationId": "deleteNote",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Note ID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"404": {
+						"description": "Note not found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"204": {
+						"description": "Note deleted"
+					}
+				}
+			},
+			"patch": {
+				"tags": [
+					"Notes"
+				],
+				"summary": "Update a note",
+				"operationId": "updateNote",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Note ID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UpdateNoteRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"404": {
+						"description": "Note not found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "Note updated",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/NoteResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/tasks/{id}/stats": {
+			"get": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "Get pomodoro stats for a task",
+				"operationId": "getStatsByTask",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Parent task ID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Pomodoro stats for the task",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/PomodoroStatsResponse"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Task not found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/tasks/{id}/sessions": {
+			"get": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "List sessions for a task",
+				"operationId": "listSessionsByTask",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Parent task ID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"404": {
+						"description": "Task not found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "List of sessions for the task",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/SessionResponse"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/tasks/{id}/notes": {
+			"get": {
+				"tags": [
+					"Tasks"
+				],
+				"summary": "List notes linked to a task",
+				"operationId": "listNotesByTask",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "Parent task ID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "List of notes for the task",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/NoteResponse"
+									}
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Task not found",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/stats": {
+			"get": {
+				"tags": [
+					"Stats"
+				],
+				"summary": "Get aggregated focus stats",
+				"operationId": "getStats",
+				"parameters": [
+					{
+						"name": "filter",
+						"in": "query",
+						"description": "Scope filter: all (default), today, week",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"default": "all"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Aggregated focus statistics",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/StatsResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/sessions": {
+			"get": {
+				"tags": [
+					"Sessions"
+				],
+				"summary": "List sessions",
+				"operationId": "listSessions",
+				"parameters": [
+					{
+						"name": "taskId",
+						"in": "query",
+						"description": "Filter sessions by task ID (optional)",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "List of sessions",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/SessionResponse"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/v1/sessions/open": {
+			"get": {
+				"tags": [
+					"Sessions"
+				],
+				"summary": "Get the currently open session or null",
+				"operationId": "getOpenSession",
+				"responses": {
+					"200": {
+						"description": "Currently open session, or null if none is running",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/SessionResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"CreateTaskRequest": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "Client-provided task ID (21-char nanoid); generated server-side if omitted",
+						"example": "V1StGXR8_Z5jdHi6B-myT"
+					},
+					"title": {
+						"type": "string",
+						"description": "Task title",
+						"example": "Write unit tests"
+					},
+					"description": {
+						"type": "string",
+						"description": "Task description",
+						"example": "Cover the happy path and error cases"
+					},
+					"completed": {
+						"type": "boolean",
+						"description": "Whether the task starts as completed; defaults to false if omitted",
+						"example": false
+					},
+					"parentId": {
+						"type": "string",
+						"description": "Parent task ID; null for root-level tasks",
+						"example": "V1StGXR8_Z5jdHi6B-myT"
+					},
+					"order": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Display order; defaults to 0 if omitted",
+						"example": 0
+					},
+					"tagIds": {
+						"type": "array",
+						"description": "Tag IDs to apply to the task",
+						"example": [
+							"tagId1"
+						],
+						"items": {
+							"type": "string"
+						}
+					},
+					"scheduledDay": {
+						"type": "string",
+						"format": "date",
+						"description": "Scheduled date (ISO-8601)",
+						"example": "2026-03-23"
+					},
+					"dueDate": {
+						"type": "string",
+						"format": "date",
+						"description": "Due date (ISO-8601)",
+						"example": "2026-03-30"
+					}
+				},
+				"required": [
+					"title"
+				]
+			},
+			"ErrorResponse": {
+				"type": "object",
+				"properties": {
+					"error": {
+						"type": "string",
+						"description": "Error message describing what went wrong",
+						"example": "Task not found: abc123"
+					}
+				}
+			},
+			"TaskResponse": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "Task ID (21-char nanoid)",
+						"example": "V1StGXR8_Z5jdHi6B-myT",
+						"readOnly": true
+					},
+					"title": {
+						"type": "string",
+						"description": "Task title",
+						"example": "Write unit tests"
+					},
+					"description": {
+						"type": "string",
+						"description": "Task description",
+						"example": "Cover the happy path and error cases"
+					},
+					"completed": {
+						"type": "boolean",
+						"description": "Whether the task is done",
+						"example": false
+					},
+					"parentId": {
+						"type": "string",
+						"description": "Parent task ID; null for root-level tasks",
+						"example": "V1StGXR8_Z5jdHi6B-myT"
+					},
+					"order": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Display order within its parent (0-based)",
+						"example": 0
+					},
+					"tagIds": {
+						"type": "array",
+						"description": "List of tag IDs applied to this task",
+						"example": [
+							"tagId1",
+							"tagId2"
+						],
+						"items": {
+							"type": "string"
+						}
+					},
+					"scheduledDay": {
+						"type": "string",
+						"format": "date",
+						"description": "Scheduled date (ISO-8601)",
+						"example": "2026-03-23"
+					},
+					"dueDate": {
+						"type": "string",
+						"format": "date",
+						"description": "Due date (ISO-8601)",
+						"example": "2026-03-30"
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Creation timestamp (ISO-8601)",
+						"example": "2026-03-23T10:00:00Z",
+						"readOnly": true
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Last update timestamp (ISO-8601)",
+						"example": "2026-03-23T10:30:00Z",
+						"readOnly": true
+					}
+				}
+			},
+			"ReorderRequest": {
+				"type": "object",
+				"properties": {
+					"parentId": {
+						"type": "string",
+						"description": "Parent task ID; null means reorder root-level tasks",
+						"example": "V1StGXR8_Z5jdHi6B-myT"
+					},
+					"orderedIds": {
+						"type": "array",
+						"description": "Ordered list of task IDs in their desired positions",
+						"example": [
+							"id1",
+							"id2",
+							"id3"
+						],
+						"items": {
+							"type": "string"
+						}
+					}
+				},
+				"required": [
+					"orderedIds"
+				]
+			},
+			"CreateTagRequest": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "Client-provided tag ID; generated server-side if omitted",
+						"example": "V1StGXR8_Z5jdHi6B-myT"
+					},
+					"name": {
+						"type": "string",
+						"description": "Tag name",
+						"example": "backend"
+					},
+					"color": {
+						"type": "string",
+						"description": "Hex color string",
+						"example": "#FF5733"
+					}
+				},
+				"required": [
+					"color",
+					"name"
+				]
+			},
+			"TagResponse": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "Tag ID (21-char nanoid)",
+						"example": "V1StGXR8_Z5jdHi6B-myT",
+						"readOnly": true
+					},
+					"name": {
+						"type": "string",
+						"description": "Tag name",
+						"example": "backend"
+					},
+					"color": {
+						"type": "string",
+						"description": "Hex color string",
+						"example": "#FF5733"
+					}
+				}
+			},
+			"StartWorkSessionRequest": {
+				"type": "object",
+				"properties": {
+					"taskId": {
+						"type": "string",
+						"description": "ID of the task to work on",
+						"example": "V1StGXR8_Z5jdHi6B-myT"
+					}
+				},
+				"required": [
+					"taskId"
+				]
+			},
+			"SessionResponse": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "Session ID (21-char nanoid)",
+						"example": "V1StGXR8_Z5jdHi6B-myT",
+						"readOnly": true
+					},
+					"taskId": {
+						"type": "string",
+						"description": "ID of the task this session belongs to; null for standalone break sessions",
+						"example": "V1StGXR8_Z5jdHi6B-myT"
+					},
+					"startedAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Session start timestamp (ISO-8601)",
+						"example": "2026-03-23T10:00:00Z",
+						"readOnly": true
+					},
+					"completedAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Session end timestamp (ISO-8601); null if session is still open",
+						"example": "2026-03-23T10:25:00Z",
+						"readOnly": true
+					},
+					"type": {
+						"type": "string",
+						"description": "Session type: work, short_break, or long_break",
+						"enum": [
+							"work",
+							"short_break",
+							"long_break"
+						],
+						"example": "work"
+					},
+					"durationMinutes": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Planned duration in minutes (25 for work, 5 for short_break, 15 for long_break)",
+						"example": 25,
+						"readOnly": true
+					},
+					"isOpen": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Integer flag: 1 = session is running, 0 = session is closed (stored as int rather than boolean to match the DB column type)",
+						"example": 1,
+						"readOnly": true
+					}
+				}
+			},
+			"StartBreakSessionRequest": {
+				"type": "object",
+				"properties": {
+					"taskId": {
+						"type": "string",
+						"description": "Task ID to associate this break with; optional",
+						"example": "V1StGXR8_Z5jdHi6B-myT"
+					},
+					"type": {
+						"type": "string",
+						"description": "Break type: short_break (5 min) or long_break (15 min)",
+						"enum": [
+							"work",
+							"short_break",
+							"long_break"
+						],
+						"example": "short_break"
+					}
+				},
+				"required": [
+					"type"
+				]
+			},
+			"CreateNoteRequest": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "Client-provided note ID; generated server-side if omitted",
+						"example": "V1StGXR8_Z5jdHi6B-myT"
+					},
+					"title": {
+						"type": "string",
+						"description": "Note title",
+						"example": "Sprint retro notes"
+					},
+					"content": {
+						"type": "string",
+						"description": "Note body (Markdown supported)",
+						"example": "## What went well\n- Fast CI"
+					},
+					"tagIds": {
+						"type": "array",
+						"description": "Tag IDs to apply to the note",
+						"example": [
+							"tagId1"
+						],
+						"items": {
+							"type": "string"
+						}
+					},
+					"linkedTaskIds": {
+						"type": "array",
+						"description": "Task IDs to link this note to",
+						"example": [
+							"taskId1"
+						],
+						"items": {
+							"type": "string"
+						}
+					}
+				},
+				"required": [
+					"content",
+					"title"
+				]
+			},
+			"NoteResponse": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "Note ID (21-char nanoid)",
+						"example": "V1StGXR8_Z5jdHi6B-myT",
+						"readOnly": true
+					},
+					"title": {
+						"type": "string",
+						"description": "Note title",
+						"example": "Sprint retro notes"
+					},
+					"content": {
+						"type": "string",
+						"description": "Note body (Markdown supported)",
+						"example": "## What went well\n- Fast CI"
+					},
+					"tagIds": {
+						"type": "array",
+						"description": "Tag IDs applied to this note",
+						"example": [
+							"tagId1"
+						],
+						"items": {
+							"type": "string"
+						}
+					},
+					"linkedTaskIds": {
+						"type": "array",
+						"description": "IDs of tasks this note is linked to",
+						"example": [
+							"taskId1"
+						],
+						"items": {
+							"type": "string"
+						}
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Creation timestamp (ISO-8601)",
+						"example": "2026-03-23T10:00:00Z",
+						"readOnly": true
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Last update timestamp (ISO-8601)",
+						"example": "2026-03-23T10:30:00Z",
+						"readOnly": true
+					}
+				}
+			},
+			"JsonNullableLocalDate": {
+				"type": "object",
+				"properties": {
+					"present": {
+						"type": "boolean"
+					}
+				}
+			},
+			"JsonNullableString": {
+				"type": "object",
+				"properties": {
+					"present": {
+						"type": "boolean"
+					}
+				}
+			},
+			"UpdateTaskRequest": {
+				"type": "object",
+				"properties": {
+					"title": {
+						"type": "string",
+						"description": "New title; omit to leave unchanged",
+						"example": "Write unit tests"
+					},
+					"description": {
+						"type": "string",
+						"description": "New description; omit to leave unchanged",
+						"example": "Cover the happy path"
+					},
+					"completed": {
+						"type": "boolean",
+						"description": "Mark as completed or uncompleted; omit to leave unchanged",
+						"example": true
+					},
+					"parentId": {
+						"$ref": "#/components/schemas/JsonNullableString",
+						"description": "New parent task ID; pass null to move to root; omit to leave unchanged",
+						"example": "V1StGXR8_Z5jdHi6B-myT"
+					},
+					"order": {
+						"type": "integer",
+						"format": "int32",
+						"description": "New display order; omit to leave unchanged",
+						"example": 1
+					},
+					"tagIds": {
+						"type": "array",
+						"description": "New tag IDs; omit to leave unchanged",
+						"example": [
+							"tagId1"
+						],
+						"items": {
+							"type": "string"
+						}
+					},
+					"scheduledDay": {
+						"$ref": "#/components/schemas/JsonNullableLocalDate",
+						"description": "New scheduled date; pass null to clear; omit to leave unchanged",
+						"example": "2026-03-23"
+					},
+					"dueDate": {
+						"$ref": "#/components/schemas/JsonNullableLocalDate",
+						"description": "New due date; pass null to clear; omit to leave unchanged",
+						"example": "2026-03-30"
+					}
+				}
+			},
+			"UpdateTagRequest": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "New name; omit to leave unchanged",
+						"example": "frontend"
+					},
+					"color": {
+						"type": "string",
+						"description": "New hex color; omit to leave unchanged",
+						"example": "#33AAFF"
+					}
+				}
+			},
+			"UpdateNoteRequest": {
+				"type": "object",
+				"properties": {
+					"title": {
+						"type": "string",
+						"description": "New title; omit to leave unchanged",
+						"example": "Sprint retro notes"
+					},
+					"content": {
+						"type": "string",
+						"description": "New body; omit to leave unchanged",
+						"example": "## What went well\n- Fast CI"
+					},
+					"tagIds": {
+						"type": "array",
+						"description": "New tag IDs; omit to leave unchanged",
+						"example": [
+							"tagId1"
+						],
+						"items": {
+							"type": "string"
+						}
+					},
+					"linkedTaskIds": {
+						"type": "array",
+						"description": "New linked task IDs; omit to leave unchanged",
+						"example": [
+							"taskId1"
+						],
+						"items": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"PomodoroStatsResponse": {
+				"type": "object",
+				"properties": {
+					"taskId": {
+						"type": "string",
+						"description": "Task this stat record belongs to",
+						"example": "V1StGXR8_Z5jdHi6B-myT",
+						"readOnly": true
+					},
+					"totalStarted": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Total work sessions started for this task",
+						"example": 10,
+						"readOnly": true
+					},
+					"totalCompleted": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Total work sessions completed for this task",
+						"example": 8,
+						"readOnly": true
+					},
+					"totalInterrupted": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Total work sessions interrupted for this task",
+						"example": 2,
+						"readOnly": true
+					},
+					"totalMinutesFocused": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Total focused minutes for this task",
+						"example": 200,
+						"readOnly": true
+					},
+					"lastSessionAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Timestamp of the most recent session; null if no sessions yet",
+						"example": "2026-03-23T13:00:00Z",
+						"readOnly": true
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Timestamp of the last stats update (ISO-8601)",
+						"example": "2026-03-23T14:00:00Z",
+						"readOnly": true
+					}
+				}
+			},
+			"DailyFocusPointDto": {
+				"type": "object",
+				"properties": {
+					"date": {
+						"type": "string",
+						"description": "ISO-8601 date for 'all'/'week' filter, hour integer string for 'today' filter",
+						"example": "2026-03-23"
+					},
+					"hours": {
+						"type": "number",
+						"format": "double",
+						"description": "Focus hours on this date/hour",
+						"example": 1.75
+					}
+				}
+			},
+			"StatsResponse": {
+				"type": "object",
+				"properties": {
+					"totalMinutesFocused": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Total focused minutes across all tasks",
+						"example": 200,
+						"readOnly": true
+					},
+					"totalCompleted": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Total completed work sessions",
+						"example": 8,
+						"readOnly": true
+					},
+					"totalInterrupted": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Total interrupted work sessions",
+						"example": 2,
+						"readOnly": true
+					},
+					"completionRate": {
+						"type": "number",
+						"format": "double",
+						"description": "Ratio of completed to started sessions, null if no sessions",
+						"example": 0.85,
+						"readOnly": true
+					},
+					"weeklyTrend": {
+						"type": "array",
+						"description": "Weekly focus trend — one data point per period",
+						"items": {
+							"$ref": "#/components/schemas/TrendPointDto"
+						}
+					},
+					"taskStats": {
+						"type": "array",
+						"description": "Per-task focus statistics",
+						"items": {
+							"$ref": "#/components/schemas/TaskStatPointDto"
+						}
+					},
+					"dailyFocus": {
+						"type": "array",
+						"description": "Daily focus breakdown — one point per day or hour",
+						"items": {
+							"$ref": "#/components/schemas/DailyFocusPointDto"
+						}
+					}
+				}
+			},
+			"TaskStatPointDto": {
+				"type": "object",
+				"properties": {
+					"taskId": {
+						"type": "string",
+						"description": "Task ID (21-char nanoid)",
+						"example": "V1StGXR8_Z5jdHi6B-myT"
+					},
+					"title": {
+						"type": "string",
+						"description": "Task title",
+						"example": "Write unit tests"
+					},
+					"minutesFocused": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Total focused minutes on this task",
+						"example": 90
+					},
+					"completed": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Number of completed work sessions",
+						"example": 3
+					},
+					"interrupted": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Number of interrupted work sessions",
+						"example": 1
+					},
+					"started": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Total work sessions started",
+						"example": 4
+					}
+				}
+			},
+			"TrendPointDto": {
+				"type": "object",
+				"properties": {
+					"label": {
+						"type": "string",
+						"description": "Period label: hour (0–23) for 'today', day name for 'week', month abbr for 'all'",
+						"example": "Mon"
+					},
+					"hours": {
+						"type": "number",
+						"format": "double",
+						"description": "Focus hours in this period",
+						"example": 2.5
+					}
+				}
+			}
+		}
+	}
+}
