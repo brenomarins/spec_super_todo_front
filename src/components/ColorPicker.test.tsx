@@ -22,3 +22,48 @@ test('selected swatch has aria-pressed=true', () => {
   expect(buttons[0]).toHaveAttribute('aria-pressed', 'true')
   expect(buttons[1]).toHaveAttribute('aria-pressed', 'false')
 })
+
+test('renders hex input with current selected color', () => {
+  render(<ColorPicker selected="#3b82f6" onSelect={() => {}} />)
+  const input = screen.getByRole('textbox')
+  expect(input).toHaveValue('#3b82f6')
+})
+
+test('typing a valid 6-digit hex calls onSelect', () => {
+  const onSelect = vi.fn()
+  render(<ColorPicker selected="#3b82f6" onSelect={onSelect} />)
+  const input = screen.getByRole('textbox')
+  fireEvent.change(input, { target: { value: '#aabbcc' } })
+  expect(onSelect).toHaveBeenCalledWith('#aabbcc')
+})
+
+test('typing a valid hex without # prefix calls onSelect with # prepended', () => {
+  const onSelect = vi.fn()
+  render(<ColorPicker selected="#3b82f6" onSelect={onSelect} />)
+  const input = screen.getByRole('textbox')
+  fireEvent.change(input, { target: { value: 'aabbcc' } })
+  expect(onSelect).toHaveBeenCalledWith('#aabbcc')
+})
+
+test('typing an invalid hex does not call onSelect', () => {
+  const onSelect = vi.fn()
+  render(<ColorPicker selected="#3b82f6" onSelect={onSelect} />)
+  const input = screen.getByRole('textbox')
+  fireEvent.change(input, { target: { value: '#gg0000' } })
+  expect(onSelect).not.toHaveBeenCalled()
+})
+
+test('typing a partial hex (3 chars) does not call onSelect', () => {
+  const onSelect = vi.fn()
+  render(<ColorPicker selected="#3b82f6" onSelect={onSelect} />)
+  const input = screen.getByRole('textbox')
+  fireEvent.change(input, { target: { value: '#3b8' } })
+  expect(onSelect).not.toHaveBeenCalled()
+})
+
+test('preset swatch has aria-pressed=true when hex matches preset', () => {
+  render(<ColorPicker selected="#ef4444" onSelect={() => {}} />)
+  const buttons = screen.getAllByRole('button')
+  // #ef4444 is the 2nd preset color
+  expect(buttons[1]).toHaveAttribute('aria-pressed', 'true')
+})
