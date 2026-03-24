@@ -11,6 +11,7 @@ const mockStore = {
   startSession: vi.fn(),
   stopSession: vi.fn(),
   completeSession: vi.fn(),
+  startBreakSession: vi.fn(),
 }
 
 beforeEach(() => {
@@ -44,4 +45,14 @@ test('calls completeSession when countdown reaches zero', () => {
   const { result } = renderHook(() => usePomodoro())
   act(() => { vi.advanceTimersByTime(61_000) })
   expect(mockStore.completeSession).toHaveBeenCalled()
+})
+
+test('exposes completeSession from the store', () => {
+  const { result } = renderHook(() => usePomodoro())
+  expect(result.current.completeSession).toBe(mockStore.completeSession)
+})
+
+test('exposes startBreakSession from the store', () => {
+  const { result } = renderHook(() => usePomodoro())
+  expect(typeof result.current.startBreakSession).toBe('function')
 })

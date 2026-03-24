@@ -15,7 +15,7 @@ function formatTime(seconds: number): string {
 }
 
 export function usePomodoro() {
-  const { activeSession, workSessionCount, startSession, stopSession, completeSession } = usePomodoroStore()
+  const { activeSession, workSessionCount, startSession, stopSession, completeSession, startBreakSession } = usePomodoroStore()
   const [secondsLeft, setSecondsLeft] = useState<number>(() => {
     if (!activeSession) return DURATIONS.work
     const elapsed = Math.floor((Date.now() - Date.parse(activeSession.startedAt)) / 1000)
@@ -58,5 +58,7 @@ export function usePomodoro() {
     workSessionCount,
     startSession,
     stopSession,
+    completeSession,
+    startBreakSession,
   }
 }
