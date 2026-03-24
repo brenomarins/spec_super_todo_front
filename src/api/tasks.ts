@@ -44,6 +44,7 @@ export interface ReorderInput {
 function normalizeTask(raw: Task): Task {
   return {
     ...raw,
+    description:  raw.description  ?? undefined,
     parentId:     raw.parentId     ?? undefined,
     scheduledDay: raw.scheduledDay ?? undefined,
     dueDate:      raw.dueDate      ?? undefined,

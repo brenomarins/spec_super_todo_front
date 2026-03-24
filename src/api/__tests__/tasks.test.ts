@@ -20,6 +20,7 @@ const rawTask = {
   parentId: null,
   scheduledDay: null,
   dueDate: null,
+  description: null,
   createdAt: '2026-01-01T00:00:00Z',
   updatedAt: '2026-01-01T00:00:00Z',
 }
@@ -47,6 +48,12 @@ describe('normalizeTask (via listTasks)', () => {
     expect(task.parentId).toBeUndefined()
   })
 
+  it('converts null description to undefined', async () => {
+    mockApiFetch.mockResolvedValue([{ ...rawTask, description: null }])
+    const [task] = await listTasks()
+    expect(task.description).toBeUndefined()
+  })
+
   it('preserves string dueDate', async () => {
     mockApiFetch.mockResolvedValue([{ ...rawTask, dueDate: '2026-12-31' }])
     const [task] = await listTasks()
@@ -68,12 +75,16 @@ describe('normalizeTask (via listTasks)', () => {
   it('preserves all other fields unchanged', async () => {
     mockApiFetch.mockResolvedValue([{ ...rawTask }])
     const [task] = await listTasks()
-    expect(task).toMatchObject({
+    expect(task).toStrictEqual({
       id: 'abc',
       title: 'Test task',
       completed: false,
       order: 1000,
       tagIds: [],
+      description: undefined,
+      parentId: undefined,
+      scheduledDay: undefined,
+      dueDate: undefined,
       createdAt: '2026-01-01T00:00:00Z',
       updatedAt: '2026-01-01T00:00:00Z',
     })
