@@ -86,13 +86,16 @@ test('renders DueDateBadge for a task with a due date', () => {
   expect(screen.getByText('! Mar 10')).toBeInTheDocument()
 })
 
-// NEW TEST
-test('shows Complete button when active session is a work session', () => {
+test('shows Complete, Short Break, Long Break buttons and fires callbacks during work session', () => {
+  const completeSession = vi.fn()
+  const startBreakSession = vi.fn()
   vi.mocked(usePomodoroStore).mockReturnValue(mockPomodoro({
     activeSession: {
       sessionId: 's1', taskId: 't1', type: 'work',
-      startedAt: new Date().toISOString(),
+      startedAt: '2026-03-16T00:00:00.000Z',
     },
+    completeSession,
+    startBreakSession,
   }) as any)
   vi.mocked(useTaskStore).mockReturnValue({
     tasks: [
@@ -105,4 +108,13 @@ test('shows Complete button when active session is a work session', () => {
   expect(screen.getByText(/complete/i)).toBeInTheDocument()
   expect(screen.getByText(/short break/i)).toBeInTheDocument()
   expect(screen.getByText(/long break/i)).toBeInTheDocument()
+
+  fireEvent.click(screen.getByText(/complete/i))
+  expect(completeSession).toHaveBeenCalledTimes(1)
+
+  fireEvent.click(screen.getByText(/short break/i))
+  expect(startBreakSession).toHaveBeenCalledWith('short_break', 't1')
+
+  fireEvent.click(screen.getByText(/long break/i))
+  expect(startBreakSession).toHaveBeenCalledWith('long_break', 't1')
 })
