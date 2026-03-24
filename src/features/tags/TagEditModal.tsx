@@ -71,7 +71,6 @@ export function TagEditModal({ tag, onClose }: TagEditModalProps) {
           </label>
           <input
             id="tag-name-input"
-            aria-label="Tag name"
             value={name}
             onChange={e => setName(e.target.value)}
             style={{

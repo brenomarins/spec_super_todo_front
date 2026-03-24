@@ -74,6 +74,19 @@ test('Confirm delete calls deleteTag and closes', async () => {
   })
 })
 
+test('Cancel in delete confirmation hides the confirmation', () => {
+  renderModal()
+  // Open confirmation
+  fireEvent.click(screen.getByRole('button', { name: /^delete$/i }))
+  expect(screen.getByRole('button', { name: /confirm delete/i })).toBeInTheDocument()
+  // Click the cancel inside the confirmation (second Cancel button)
+  const cancelButtons = screen.getAllByRole('button', { name: /cancel/i })
+  fireEvent.click(cancelButtons[cancelButtons.length - 1])
+  // Confirmation should be gone, original Delete button should be back
+  expect(screen.queryByRole('button', { name: /confirm delete/i })).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: /^delete$/i })).toBeInTheDocument()
+})
+
 test('API error on Save shows toast and keeps modal open', async () => {
   vi.mocked(useTagStore).mockReturnValue({
     updateTag: vi.fn().mockRejectedValue(new Error('Network error')),
