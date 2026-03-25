@@ -1,3 +1,4 @@
+import React from 'react'
 import { SessionDots } from './SessionDots'
 
 interface PomodoroTimerProps {
@@ -14,12 +15,34 @@ interface PomodoroTimerProps {
   onLongBreak: () => void
 }
 
-const btnBase = {
+const btnBase: React.CSSProperties = {
   border: '1px solid var(--color-border)',
   padding: '6px 12px',
   borderRadius: 6,
-  cursor: 'pointer' as const,
+  cursor: 'pointer',
   fontSize: 13,
+  transition: 'transform var(--transition-fast), box-shadow var(--transition-fast)',
+}
+
+function HoverButton({ style, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      {...props}
+      style={style}
+      onMouseEnter={e => {
+        e.currentTarget.style.transform = 'translateY(-1px)'
+        const bg = (style as React.CSSProperties)?.background
+        const shadow = bg === 'var(--color-success)'
+          ? '0 3px 10px rgba(63,185,80,0.3)'
+          : '0 2px 6px rgba(0,0,0,0.3)'
+        e.currentTarget.style.boxShadow = shadow
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.transform = 'translateY(0)'
+        e.currentTarget.style.boxShadow = 'none'
+      }}
+    />
+  )
 }
 
 export function PomodoroTimer({
@@ -27,9 +50,10 @@ export function PomodoroTimer({
   onStart, onStop, onComplete, onShortBreak, onLongBreak,
 }: PomodoroTimerProps) {
   return (
-    <div style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-      borderRadius: 12, padding: 20, textAlign: 'center', maxWidth: 320, margin: '0 auto' }}>
-
+    <div style={{
+      background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+      borderRadius: 12, padding: 20, textAlign: 'center', maxWidth: 320, margin: '0 auto',
+    }}>
       {taskTitle && (
         <div style={{ fontSize: 12, color: 'var(--color-text-muted)', marginBottom: 8, textTransform: 'uppercase' }}>
           {isRunning && <span>FOCUS — </span>}
@@ -37,48 +61,54 @@ export function PomodoroTimer({
         </div>
       )}
 
-      <div style={{ fontSize: 52, fontWeight: 700, color: 'var(--color-warning)',
-        fontVariantNumeric: 'tabular-nums', marginBottom: 12 }}>
+      <div style={{
+        fontSize: 52, fontWeight: 700, color: 'var(--color-warning)',
+        fontVariantNumeric: 'tabular-nums', marginBottom: 12,
+        animation: 'breathe 3s ease-in-out infinite',
+      }}>
         {display}
       </div>
 
       <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
         {sessionType === 'work' ? (
           <>
-            <button type="button" onClick={onComplete}
+            <HoverButton type="button" onClick={onComplete}
               style={{ ...btnBase, background: 'var(--color-success)', color: '#fff', border: 'none' }}>
               ✅ Complete
-            </button>
-            <button type="button" onClick={onShortBreak}
+            </HoverButton>
+            <HoverButton type="button" onClick={onShortBreak}
               style={{ ...btnBase, background: 'var(--color-surface-2)', color: 'var(--color-text)' }}>
               ☕ Short Break
-            </button>
-            <button type="button" onClick={onLongBreak}
+            </HoverButton>
+            <HoverButton type="button" onClick={onLongBreak}
               style={{ ...btnBase, background: 'var(--color-surface-2)', color: 'var(--color-text)' }}>
               🌙 Long Break
-            </button>
-            <button type="button" onClick={onStop}
+            </HoverButton>
+            <HoverButton type="button" onClick={onStop}
               style={{ ...btnBase, background: 'var(--color-surface-2)', color: 'var(--color-text)' }}>
               ⏹ Stop
-            </button>
+            </HoverButton>
           </>
         ) : isRunning ? (
-          <button type="button" onClick={onStop}
+          <HoverButton type="button" onClick={onStop}
             style={{ ...btnBase, background: 'var(--color-surface-2)', color: 'var(--color-text)' }}>
             ⏹ Stop
-          </button>
+          </HoverButton>
         ) : (
-          <button
+          <HoverButton
             type="button"
             onClick={() => taskId && onStart(taskId)}
             disabled={!taskId}
-            style={{ background: 'var(--color-success)', border: 'none', color: '#fff',
+            style={{
+              background: 'var(--color-success)', border: 'none', color: '#fff',
               padding: '6px 16px', borderRadius: 6,
               cursor: taskId ? 'pointer' : 'default',
-              fontSize: 13, opacity: taskId ? 1 : 0.5 }}
+              fontSize: 13, opacity: taskId ? 1 : 0.5,
+              transition: 'transform var(--transition-fast), box-shadow var(--transition-fast)',
+            }}
           >
             ▶ Start
-          </button>
+          </HoverButton>
         )}
       </div>
 
