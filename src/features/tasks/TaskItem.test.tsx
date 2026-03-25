@@ -49,3 +49,19 @@ test('SubtaskItem renders with completed strikethrough', () => {
   const title = screen.getByText('Design Homepage')
   expect(title).toHaveStyle({ textDecoration: 'line-through' })
 })
+
+test('TaskItem applies completed styles to title when done', () => {
+  const completedTask = { ...task, completed: true }
+  render(<TaskItem task={completedTask} tags={[]} pomodoroCount={0}
+    onClick={() => {}} onToggle={() => {}} dragHandleProps={null} />)
+  const title = screen.getByText('Design Homepage')
+  expect(title).toHaveStyle({ textDecoration: 'line-through' })
+})
+
+test('TaskItem row has green tint background when completed', () => {
+  const completedTask = { ...task, completed: true }
+  const { container } = render(<TaskItem task={completedTask} tags={[]} pomodoroCount={0}
+    onClick={() => {}} onToggle={() => {}} dragHandleProps={null} />)
+  const row = container.firstChild as HTMLElement
+  expect(row.getAttribute('style')).toContain('var(--color-success-bg)')
+})
