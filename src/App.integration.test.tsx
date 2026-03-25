@@ -10,7 +10,22 @@ vi.mock('./api/tags')
 vi.mock('./api/notes')
 vi.mock('./api/sessions')
 
+function mockMatchMedia(prefersLight = false) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: query === '(prefers-color-scheme: light)' ? prefersLight : false,
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })),
+  })
+}
+
 beforeEach(() => {
+  localStorage.clear()
+  document.documentElement.removeAttribute('data-theme')
+  mockMatchMedia(false)
   vi.mocked(apiTasks.listTasks).mockResolvedValue([])
   vi.mocked(apiTags.listTags).mockResolvedValue([])
   vi.mocked(apiNotes.listNotes).mockResolvedValue([])
