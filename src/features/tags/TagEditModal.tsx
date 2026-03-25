@@ -50,7 +50,8 @@ export function TagEditModal({ tag, onClose }: TagEditModalProps) {
       style={{
         position: 'fixed', inset: 0, zIndex: 100,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'rgba(0,0,0,0.5)',
+        background: 'rgba(0,0,0,0.55)',
+        transition: 'opacity 200ms ease',
       }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
@@ -58,6 +59,8 @@ export function TagEditModal({ tag, onClose }: TagEditModalProps) {
         background: 'var(--color-bg)', border: '1px solid var(--color-border)',
         borderRadius: 8, padding: 20, width: 300, display: 'flex',
         flexDirection: 'column', gap: 14,
+        animation: 'modal-in 200ms var(--ease-out) both',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
       }}>
         <div style={{ fontWeight: 600, fontSize: 15 }}>Edit Tag</div>
 
