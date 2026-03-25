@@ -22,16 +22,18 @@ Improve the app's user-friendliness by introducing consistent Whisper-level micr
 
 ## Section 1 — CSS Token System
 
-Add to `:root` in `index.css`:
+Add new tokens to the existing `:root` block in `index.css`. **The existing `--radius: 6px` and all current tokens are preserved** — new tokens are additive only. No find-and-replace of `--radius` is needed; components already using it are unchanged.
 
 ```css
+/* Add to existing :root block */
+
 /* Transition tokens */
 --transition-fast: 150ms ease;
 --transition-base: 200ms ease;
 --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
-/* Visual tokens */
+/* New visual tokens (dark values) */
 --radius-sm: 4px;
 --radius-md: 6px;
 --radius-lg: 10px;
@@ -40,7 +42,7 @@ Add to `:root` in `index.css`:
 --color-success-border: #2a3f2e;
 ```
 
-Add a `:root[data-theme="light"]` block with the light palette:
+Add a `:root[data-theme="light"]` block with the light palette. The `data-theme="light"` attribute is set on `<html>` by the theme hook; when absent, dark is active.
 
 ```css
 :root[data-theme="light"] {
@@ -57,10 +59,44 @@ Add a `:root[data-theme="light"]` block with the light palette:
   --color-success-border: #aceebb;
   --color-warning: #bc4c00;
   --color-danger: #cf222e;
+  --color-purple: #8250df;
 }
 ```
 
-Theme switching is achieved by setting `data-theme="light"` on the `<html>` element. Dark is the default (no attribute needed).
+Add body transition and `prefers-reduced-motion` block:
+
+```css
+body {
+  /* existing styles... */
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+Define shared keyframes in `index.css` (used by multiple components):
+
+```css
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+@keyframes toast-in {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes modal-in {
+  from { transform: translateY(8px) scale(0.97); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+```
 
 ---
 
@@ -68,84 +104,154 @@ Theme switching is achieved by setting `data-theme="light"` on the `<html>` elem
 
 New file: `src/lib/useTheme.ts`
 
-- Reads from `localStorage` key `"theme"` on mount
-- Falls back to `window.matchMedia('(prefers-color-scheme: light)')` if no stored value
-- Sets `document.documentElement.setAttribute('data-theme', theme)` when theme is `'light'`; removes the attribute for dark
-- Persists changes to `localStorage`
-- Returns `{ theme, toggleTheme }` — `theme` is `'dark' | 'light'`
+- Uses a **lazy `useState` initializer** to read the stored theme synchronously before first render, preventing any flash of the wrong theme:
+
+```ts
+function readStoredTheme(): 'dark' | 'light' {
+  try {
+    const stored = localStorage.getItem('theme')
+    if (stored === 'dark' || stored === 'light') return stored
+  } catch { /* localStorage unavailable */ }
+  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+}
+
+export function useTheme() {
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => readStoredTheme())
+
+  useEffect(() => {
+    if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light')
+    } else {
+      document.documentElement.removeAttribute('data-theme')
+    }
+    try { localStorage.setItem('theme', theme) } catch { /* ignore */ }
+  }, [theme])
+
+  const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark')
+  return { theme, toggleTheme }
+}
+```
+
+- `localStorage` key: `"theme"`
+- Attribute: `data-theme="light"` on `document.documentElement`; removed for dark
 
 ---
 
 ## Section 3 — Component Changes
 
-### `App.tsx` — Tab bar + theme toggle
+### `TabBar.tsx` — animated underline + theme toggle
 
-- Add an animated underline indicator to the active tab: `::after` pseudo-element, 2px height, accent color, animates in with `scaleX` from 0 on tab switch
-- Add the theme toggle button at the far right of the tab bar row: icon-only (☀️ dark → 🌙 light), `width/height: 28px`, border-radius `--radius-md`, transitions `opacity` on hover
+The theme toggle button lives inside `TabBar.tsx`. The component calls `useTheme()` directly.
 
-### `index.css` — Body transition
+**Structural change:** wrap the existing `<nav>` content in a flex row with `justify-content: space-between`:
+- Left side: existing tab buttons (unchanged mapping)
+- Right side: new theme toggle button
 
-Add `transition: background-color 200ms ease, color 200ms ease` to `body` so the theme switch fades smoothly instead of hard-cutting.
+**Active tab underline:** replace the current `borderBottom: active === tab.id ? '2px solid ...' : '2px solid transparent'` approach with a CSS-animated `::after` pseudo-element using a className. Use a `<style>` tag or a CSS module. The active button gets class `tab-active`; the `::after` element animates in via `animation: slide-in-tab 200ms var(--ease-spring)`:
+
+```css
+@keyframes slide-in-tab {
+  from { transform: scaleX(0); opacity: 0; }
+  to { transform: scaleX(1); opacity: 1; }
+}
+```
+
+**Theme toggle button:** icon-only, `width: 28px`, `height: 28px`, `border-radius: var(--radius-md)`, `border: 1px solid var(--color-border)`, `background: var(--color-surface-2)`. Shows `☀️` when `theme === 'dark'` (switch to light), `🌙` when `theme === 'light'` (switch to dark). Hover: `background: var(--color-surface-hover)`, `transform: scale(1.08)`, `transition: var(--transition-fast)`.
+
+### `index.css` — body transition
+
+Already covered in Section 1.
 
 ### `TaskItem.tsx` — Hover + Pop & Shift completion
 
 **Hover state:**
-- Background → `--color-surface-hover`
-- Border → slightly lighter (`#3d444d` in dark / `#b1bac4` in light)
-- Subtle `box-shadow: 0 1px 4px rgba(0,0,0,0.3)`
-- All via `transition: background var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base)`
+- Background → `var(--color-surface-hover)`
+- Border → `#3d444d` (dark) / inherits from light tokens
+- `box-shadow: 0 1px 4px rgba(0,0,0,0.3)`
+- `transition: background var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base)`
 
 **Completion (Pop & Shift):**
-- Checkbox: `transform: scale(1.15)` with `--ease-spring`, fill becomes `--color-success`
-- Task title: `translateX(3px)`, `opacity: 0.7`, `text-decoration: line-through`, `color: --color-text-muted`
-- Row background: `--color-success-bg`, border: `--color-success-border`
+- Checkbox: `transform: scale(1.15)` with `--ease-spring`, fill `var(--color-success)`, border `var(--color-success)`, checkmark color `white`
+- Task title: `translateX(3px)`, `opacity: 0.7`, `text-decoration: line-through`, `color: var(--color-text-muted)`
+- Row background → `var(--color-success-bg)`, border → `var(--color-success-border)`
+- All via CSS transitions referencing `var(--transition-base)` and `var(--ease-spring)`
 
 **Pomodoro button:**
-- `opacity: 0.35` default → `opacity: 1` + `transform: scale(1.15)` on hover, using `--ease-spring`
+- `opacity: 0.35` default → `opacity: 1` + `transform: scale(1.15)` on hover
+- `transition: opacity var(--transition-fast), transform 150ms var(--ease-spring)`
 
 ### `PomodoroTimer.tsx` — Visual polish
 
-- Timer display (`fontSize: 52px`): add `animation: breathe 3s ease-in-out infinite` — subtle opacity pulse between 1 and 0.85
-- Session dots: each filled dot gets `transform: scale(1.1)` and transitions in with `--ease-spring`
-- Buttons: `transition: transform var(--transition-fast), box-shadow var(--transition-fast)` + `translateY(-1px)` on hover with a faint glow matching the button color
+- Timer display: add `animation: breathe 3s ease-in-out infinite` (keyframe defined in `index.css`)
+- Buttons: add `transition: transform var(--transition-fast), box-shadow var(--transition-fast)`. On hover: `translateY(-1px)` with a faint glow matching the button color (e.g., `box-shadow: 0 2px 6px rgba(0,0,0,0.3)` for neutral buttons, `0 3px 10px rgba(63,185,80,0.3)` for the green Complete button)
 
-### `Toast.tsx` — Slide-up entrance
+### `SessionDots.tsx` — Transition on filled dots
 
-- Add `animation: toast-in 250ms var(--ease-out) both`
-- `@keyframes toast-in`: from `{ transform: translateY(12px); opacity: 0 }` to `{ transform: translateY(0); opacity: 1 }`
+- Add `transition: background var(--transition-base), transform 200ms var(--ease-spring)` to each dot `<span>`
+- Filled dots (where `i < count % 4`): add `transform: scale(1.1)` inline
+
+### `Toast.tsx` — Slide-up entrance + variant border
+
+**New prop signature:**
+
+```ts
+interface ToastProps {
+  message: string
+  variant?: 'success' | 'error' | 'default'
+}
+```
+
+- Add `animation: toast-in 250ms var(--ease-out) both` (keyframe in `index.css`)
 - Add `box-shadow: 0 4px 16px rgba(0,0,0,0.4)`
-- Add colored left border (`3px solid --color-success` for success toasts, `3px solid --color-danger` for error toasts)
+- Add left border based on variant:
+  - `success`: `borderLeft: '3px solid var(--color-success)'`
+  - `error`: `borderLeft: '3px solid var(--color-danger)'`
+  - `default` / undefined: no left border
 
-### `TagEditModal.tsx` (and any other modals) — Slide-up entrance
+### `ToastProvider.tsx` — Pass variant through
 
-- Backdrop: `background: rgba(0,0,0,0.55)`, add `transition: opacity 200ms ease`
-- Modal panel: `animation: modal-in 200ms var(--ease-out) both`
-- `@keyframes modal-in`: from `{ transform: translateY(8px) scale(0.97); opacity: 0 }` to `{ transform: translateY(0) scale(1); opacity: 1 }`
+Update `ToastItem` interface and `showToast` signature to accept and forward `variant`:
+
+```ts
+interface ToastItem { id: number; message: string; variant?: 'success' | 'error' | 'default' }
+
+// showToast signature:
+showToast: (message: string, variant?: 'success' | 'error' | 'default') => void
+```
+
+Pass `variant` when rendering `<Toast key={t.id} message={t.message} variant={t.variant} />`. Existing callers that only pass `message` continue to work unchanged (variant defaults to `undefined` → no border).
+
+### `TagEditModal.tsx` — Slide-up modal entrance
+
+- Modal panel: add `animation: modal-in 200ms var(--ease-out) both` (keyframe in `index.css`)
 - Add `box-shadow: 0 8px 32px rgba(0,0,0,0.5)`
+- Backdrop overlay: add `transition: opacity 200ms ease`
 
-### `EmptyState.tsx` — Warmer styling
+### `EmptyState.tsx` — Minor padding reduction
 
-- Increase `font-size` to `14px`
-- Add a subtle icon or emoji prefix where appropriate
-- Use `--color-text-muted` for color (already does this — ensure padding is consistent: `padding: 24px 0`)
+- Reduce vertical padding from `48px` to `32px` to avoid excessive whitespace in compact tab views (`padding: '32px 16px'`)
+- Font size (14px) and color (`var(--color-text-muted)`) are already correct — no change needed
 
 ---
 
 ## Section 4 — Error Handling & Edge Cases
 
-- Theme preference persists across page reloads via `localStorage`
-- If `localStorage` is unavailable (e.g., private browsing), fall back to `prefers-color-scheme` gracefully — no crash
-- All transition tokens are referenced from CSS variables so they degrade gracefully if variables are unsupported (old browsers get instantaneous state changes, which is acceptable)
-- `prefers-reduced-motion`: add `@media (prefers-reduced-motion: reduce)` block in `index.css` that sets all transition/animation durations to `0.01ms`
+- Theme preference persists across reloads via `localStorage`
+- `localStorage` unavailable (private browsing): `readStoredTheme()` catches the exception and falls back to `prefers-color-scheme` — no crash
+- Lazy `useState` initializer ensures theme is applied before first paint — no flash of wrong theme
+- All transition tokens degrade gracefully if CSS variables are unsupported: instantaneous state changes, which is acceptable
+- `prefers-reduced-motion`: all durations collapse to `0.01ms` via the media query in `index.css` — fully accessible
 
 ---
 
 ## Section 5 — Testing
 
-- `useTheme` hook: unit test that it reads/writes `localStorage` and sets `data-theme` on `document.documentElement`
-- `useTheme` hook: test fallback to `prefers-color-scheme` when no `localStorage` value
-- `App.tsx`: integration test that the theme toggle button is present and switches `data-theme` on click
-- Visual transitions are CSS-only — no additional unit tests needed for animation keyframes
+- `useTheme` hook: unit test that it reads/writes `localStorage` and sets/removes `data-theme` on `document.documentElement`
+- `useTheme` hook: test fallback to `prefers-color-scheme` when no `localStorage` value present
+- `useTheme` hook: test that `localStorage` failure is caught gracefully
+- `App` / `TabBar`: integration test that the theme toggle button is present and toggles `data-theme` on click
+- `Toast`: test that `variant="success"` renders the left success border, `variant="error"` renders danger border
+- CSS-only animations and keyframes do not require unit tests
 
 ---
 
@@ -153,11 +259,13 @@ Add `transition: background-color 200ms ease, color 200ms ease` to `body` so the
 
 | File | Change |
 |---|---|
-| `src/index.css` | Add transition tokens, new color tokens, light theme block, `prefers-reduced-motion` block, body transition |
-| `src/lib/useTheme.ts` | New — theme hook with localStorage persistence |
-| `src/App.tsx` | Add theme toggle button to tab bar |
+| `src/index.css` | Add transition tokens, new color tokens, light theme block, keyframes, `prefers-reduced-motion` block, body transition |
+| `src/lib/useTheme.ts` | **New** — theme hook with lazy init, localStorage persistence, `data-theme` attribute management |
+| `src/components/TabBar.tsx` | Add animated underline indicator, call `useTheme()`, add theme toggle button far right |
 | `src/features/tasks/TaskItem.tsx` | Hover states + Pop & Shift completion animation |
-| `src/features/pomodoro/PomodoroTimer.tsx` | Breathing timer + button hover lifts |
-| `src/components/Toast.tsx` | Slide-up entrance animation + colored left border |
-| `src/features/tags/TagEditModal.tsx` | Slide-up modal entrance |
-| `src/components/EmptyState.tsx` | Warmer padding/sizing |
+| `src/features/pomodoro/PomodoroTimer.tsx` | Breathing timer animation + button hover lifts |
+| `src/features/pomodoro/SessionDots.tsx` | Transition + scale on filled dots |
+| `src/components/Toast.tsx` | Slide-up entrance + optional `variant` prop + colored left border |
+| `src/components/ToastProvider.tsx` | Forward `variant` through `showToast` and `ToastItem` |
+| `src/features/tags/TagEditModal.tsx` | Slide-up modal entrance + backdrop transition |
+| `src/components/EmptyState.tsx` | Reduce vertical padding from 48px to 32px |
