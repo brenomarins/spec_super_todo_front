@@ -74,3 +74,11 @@ test('switches to Stats tab on click', async () => {
     expect(screen.getByTestId('stats-tab')).toBeInTheDocument()
   })
 })
+
+test('theme toggle button is present and toggles data-theme on click', async () => {
+  render(<App />)
+  await waitFor(() => screen.getByLabelText('Switch to light theme'))
+  expect(document.documentElement.getAttribute('data-theme')).toBeNull()
+  fireEvent.click(screen.getByLabelText('Switch to light theme'))
+  expect(document.documentElement.getAttribute('data-theme')).toBe('light')
+})

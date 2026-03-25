@@ -27,7 +27,7 @@ export function TaskItem({ task, tags, pomodoroCount, isActive, onClick, onToggl
         border: `1px solid ${
           isActive ? 'var(--color-warning)'
           : task.completed ? 'var(--color-success-border)'
-          : hovered ? '#3d444d'
+          : hovered ? 'var(--color-border-hover)'
           : 'var(--color-border)'
         }`,
         borderRadius: 6, padding: '8px 10px', display: 'flex', alignItems: 'flex-start', gap: 8,

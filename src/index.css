@@ -30,6 +30,7 @@ body {
   --radius-md: 6px;
   --radius-lg: 10px;
   --color-surface-hover: #1e242c;
+  --color-border-hover: #3d444d;
   --color-success-bg: #1c2a1e;
   --color-success-border: #2a3f2e;
 }
@@ -44,6 +45,7 @@ body {
   --color-text-muted: #656d76;
   --color-accent: #0969da;
   --color-success: #1a7f37;
+  --color-border-hover: #b3bac5;
   --color-success-bg: #dafbe1;
   --color-success-border: #aceebb;
   --color-warning: #bc4c00;
